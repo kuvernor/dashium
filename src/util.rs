@@ -9,3 +9,7 @@ pub fn hash_gjp2(password: &str) -> String {
     let hashed = hasher.finalize();
     format!("{:x}", hashed)
 }
+
+pub fn is_ascii_alphanumeric(s: &str) -> bool {
+    s.chars().all(|c| c.is_ascii_alphanumeric())
+}

@@ -18,4 +18,26 @@ impl User {
 
         Ok(())
     }
+
+    pub async fn is_username_taken(pool: &PgPool, username: &str) -> Result<bool> {
+        let exists: bool = sqlx::query_scalar!(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE username = $1) AS \"exists!\"",
+            username
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(exists)
+    }
+
+    pub async fn is_email_taken(pool: &PgPool, email: &str) -> Result<bool> {
+        let exists: bool = sqlx::query_scalar!(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1) AS \"exists!\"",
+            email
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(exists)
+    }
 }

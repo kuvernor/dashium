@@ -25,6 +25,34 @@ pub async fn register(
     let email = &form.email;
     let gjp2 = hash_gjp2(password);
 
+    if username.len() > 20 {
+        return Ok(String::from("-4"));
+    }
+
+    if !is_ascii_alphanumeric(username) {
+        return Ok(String::from("-4"));
+    }
+
+    if username.len() < 3 {
+        return Ok(String::from("-9"));
+    }
+
+    if password.len() < 8 {
+        return Ok(String::from("-8"));
+    }
+
+    if !is_ascii_alphanumeric(password) {
+        return Ok(String::from("-5"));
+    }
+
+    if User::is_username_taken(&pool, username).await? {
+        return Ok(String::from("-2"));
+    }
+
+    if User::is_email_taken(&pool, email).await? {
+        return Ok(String::from("-3"));
+    }
+
     match User::register(&pool, username, &gjp2, email).await {
         Ok(_) => return Ok(String::from("1")),
         _ => return Ok(String::from("-1")),
