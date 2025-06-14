@@ -35,7 +35,7 @@ async fn setup_db() -> Result<PgPool> {
 }
 
 fn setup_app(pool: PgPool) -> Router {
-    Router::new().nest("/gd", gd::routes()).with_state(pool)
+    Router::new().merge(gd::routes()).with_state(pool)
 }
 
 fn setup_logging() {

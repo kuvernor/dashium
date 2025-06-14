@@ -4,5 +4,7 @@ use sqlx::PgPool;
 pub mod account;
 
 pub fn routes() -> Router<PgPool> {
-    Router::new().route("/accounts/registerGJAccount.php", post(account::register))
+    Router::new()
+        .route("/accounts/registerGJAccount.php", post(account::register))
+        .route("/accounts/loginGJAccount.php", post(account::login))
 }

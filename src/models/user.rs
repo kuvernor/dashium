@@ -40,4 +40,25 @@ impl User {
 
         Ok(exists)
     }
+
+    pub async fn get_user_id(pool: &PgPool, username: &str) -> Result<i32> {
+        let user_id: i32 =
+            sqlx::query_scalar!("SELECT id FROM users WHERE username = $1", username)
+                .fetch_one(pool)
+                .await?;
+
+        Ok(user_id)
+    }
+    pub async fn verify_password(pool: &PgPool, user_id: i32, gjp2: &str) -> Result<bool> {
+        let stored_gjp2: String =
+            sqlx::query_scalar!("SELECT gjp2 FROM users WHERE id = $1", user_id)
+                .fetch_one(pool)
+                .await?;
+
+        if gjp2 == stored_gjp2 {
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
 }
