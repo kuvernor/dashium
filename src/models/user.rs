@@ -1,8 +1,9 @@
 use anyhow::Result;
+use gd_response_derive::GDResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-#[derive(Serialize, Deserialize, Debug, FromRow)]
+#[derive(Serialize, Deserialize, Debug, FromRow, GDResponse)]
 pub struct User {}
 
 impl User {
@@ -84,5 +85,9 @@ impl User {
             .await?;
 
         Ok(save_data)
+    }
+
+    pub fn to_gd(&self) -> String {
+        self.to_gd_response(":")
     }
 }

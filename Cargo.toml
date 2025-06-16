@@ -4,7 +4,12 @@ version = "0.1.0"
 edition = "2024"
 description = "A Geometry Dash Private Server written in Rust"
 
+[workspace]
+members = ["gd_response_derive"]
+resolver = "2"
+
 [dependencies]
+gd_response_derive = { path = "./gd_response_derive" }
 axum = "0.8.4"
 anyhow = "1.0"
 dotenvy = "0.15.7"
