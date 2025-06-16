@@ -32,9 +32,8 @@ pub async fn load_data(
         return Ok(String::from("-1"));
     }
 
-    let save_data = sqlx::query_scalar!("SELECT save_data FROM users WHERE id = $1", user_id)
-        .fetch_one(&pool)
-        .await?;
-
-    Ok(format!("{save_data};21;30;a;a"))
+    match User::load_data(&pool, user_id).await {
+        Ok(save_data) => Ok(format!("{save_data};21;30;a;a")),
+        Err(_) => return Ok("-1".to_string()),
+    }
 }

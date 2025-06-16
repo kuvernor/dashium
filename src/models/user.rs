@@ -61,4 +61,28 @@ impl User {
             Ok(false)
         }
     }
+
+    pub async fn save_data(pool: &PgPool, user_id: i32, save_data: &str) -> Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE users
+            SET save_data = $1
+            WHERE id = $2
+            "#,
+            save_data,
+            user_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn load_data(pool: &PgPool, user_id: i32) -> Result<String> {
+        let save_data = sqlx::query_scalar!("SELECT save_data FROM users WHERE id = $1", user_id)
+            .fetch_one(pool)
+            .await?;
+
+        Ok(save_data)
+    }
 }

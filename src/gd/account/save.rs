@@ -30,20 +30,11 @@ pub async fn save_data(
 
     let verified = User::verify_password(&pool, user_id, gjp2).await?;
     if !verified {
-        return Ok(String::from("-1"));
+        return Ok("-1".to_string());
     }
 
-    sqlx::query!(
-        r#"
-        UPDATE users
-        SET save_data = $1
-        WHERE id = $2
-        "#,
-        save_data,
-        user_id
-    )
-    .execute(&pool)
-    .await?;
-
-    Ok("1".to_string())
+    match User::save_data(&pool, user_id, save_data).await {
+        Ok(_) => return Ok("1".to_string()),
+        Err(_) => return Ok("-1".to_string()),
+    }
 }
