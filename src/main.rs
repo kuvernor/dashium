@@ -4,6 +4,7 @@ use dotenvy::dotenv;
 use sqlx::PgPool;
 use std::env;
 use tokio::net::TcpListener;
+use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -35,7 +36,10 @@ async fn setup_db() -> Result<PgPool> {
 }
 
 fn setup_app(pool: PgPool) -> Router {
-    Router::new().merge(gd::routes()).with_state(pool)
+    Router::new()
+        .merge(gd::routes())
+        .with_state(pool)
+        .layer(TraceLayer::new_for_http())
 }
 
 fn setup_logging() {
