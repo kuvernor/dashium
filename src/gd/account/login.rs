@@ -10,7 +10,6 @@ use crate::models::User;
 pub struct LoginForm {
     #[serde(rename = "userName")]
     username: String,
-    #[serde(default)]
     gjp2: String,
     #[serde(rename = "sID")]
     steam_id: Option<String>,
