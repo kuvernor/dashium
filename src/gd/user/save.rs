@@ -28,7 +28,7 @@ pub async fn save_data(
     let gjp2 = &form.gjp2;
     let save_data = &form.save_data;
 
-    let verified = User::verify_password(&pool, user_id, gjp2).await?;
+    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
     if !verified {
         return Ok("-1".to_string());
     }

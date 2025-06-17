@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse::{Parse, ParseStream, Result};
-use syn::{parse_macro_input, Data, Fields, LitInt};
+use syn::{Data, Fields, LitInt, parse_macro_input};
 
 // #[response(key)]
 struct ResponseKey {

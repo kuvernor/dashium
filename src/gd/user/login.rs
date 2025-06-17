@@ -23,8 +23,9 @@ pub async fn login(
 ) -> Result<String, AppError> {
     let username = &form.username;
     let gjp2 = &form.gjp2;
+
     let user_id = User::get_user_id(&pool, username).await?;
-    let verified = User::verify_password(&pool, user_id, gjp2).await?;
+    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
 
     if !verified {
         debug!("{username} failed to login: incorrect username or password");

@@ -24,7 +24,6 @@ pub async fn register(
     let username = &form.username;
     let password = &form.password;
     let email = &form.email;
-    let gjp2 = hash_gjp2(password);
 
     if username.len() > 20 {
         debug!("{username} failed to register: username too long");
@@ -61,7 +60,7 @@ pub async fn register(
         return Ok(String::from("-3"));
     }
 
-    match User::register(&pool, username, &gjp2, email).await {
+    match User::register(&pool, username, password, email).await {
         Ok(_) => {
             info!("{username} registered succesfully!");
             return Ok(String::from("1"));

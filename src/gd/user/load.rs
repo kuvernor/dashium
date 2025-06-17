@@ -27,7 +27,7 @@ pub async fn load_data(
     let user_id = form.user_id;
     let gjp2 = &form.gjp2;
 
-    let verified = User::verify_password(&pool, user_id, gjp2).await?;
+    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
     if !verified {
         return Ok(String::from("-1"));
     }
