@@ -4,14 +4,12 @@ use syn::parse::{Parse, ParseStream, Result};
 use syn::{Data, Fields, LitInt, parse_macro_input};
 
 // #[response(key)]
-struct ResponseKey {
-    key: LitInt,
-}
+struct ResponseKey(LitInt);
 
 impl Parse for ResponseKey {
     fn parse(input: ParseStream) -> Result<Self> {
         let key: LitInt = input.parse()?;
-        Ok(ResponseKey { key })
+        Ok(ResponseKey(key))
     }
 }
 
@@ -31,7 +29,7 @@ pub fn response_derive(input: TokenStream) -> TokenStream {
                     if attr.path().is_ident("response") {
                         match attr.parse_args::<ResponseKey>() {
                             Ok(rk) => {
-                                field_key = Some(rk.key);
+                                field_key = Some(rk.0);
                             }
                             Err(e) => {
                                 return TokenStream::from(e.to_compile_error());

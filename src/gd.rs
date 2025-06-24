@@ -23,4 +23,5 @@ pub fn routes() -> Router<PgPool> {
         // Posts (aka account comments)
         .route("/getGJAccountComments20.php", post(post::get_posts))
         .route("/uploadGJAccComment20.php", post(post::upload_post))
+        .route("/deleteGJAccComment20.php", post(post::delete_post))
 }

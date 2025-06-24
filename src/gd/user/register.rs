@@ -63,11 +63,11 @@ pub async fn register(
     match User::register(&pool, username, password, email).await {
         Ok(_) => {
             info!("{username} registered succesfully!");
-            return Ok(String::from("1"));
+            return Ok("1".to_string());
         }
         Err(_) => {
             debug!("{username} failed to register: server error");
-            return Ok(String::from("-1"));
+            return Ok("-1".to_string());
         }
     };
 }

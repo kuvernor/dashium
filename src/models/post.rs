@@ -79,6 +79,18 @@ impl Post {
 
         Ok(post.to_string())
     }
+
+    pub async fn delete(pool: &PgPool, comment_id: i32, user_id: i32) -> Result<()> {
+        sqlx::query!(
+            "DELETE FROM posts WHERE id = $1 and user_id = $2",
+            comment_id,
+            user_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }
 
 impl Ord for Post {
