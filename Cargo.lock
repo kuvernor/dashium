@@ -290,6 +290,7 @@ dependencies = [
  "dotenvy",
  "gd_response_derive",
  "serde",
+ "serde-deserialize-duplicates",
  "serde_json",
  "sha1",
  "sqlx",
@@ -1392,6 +1393,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f0e2c6ed6606019b4e29e69dbaba95b11854410e5347d525002456dbbb786b6"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-deserialize-duplicates"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "beb1a1aaae8c5cb726dcc0714433c653fe059c9a9f9fd2d7c4475adcbbe25db8"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "syn",
 ]
 
 [[package]]

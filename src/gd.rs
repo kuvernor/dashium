@@ -16,6 +16,6 @@ pub fn routes() -> Router<PgPool> {
             "/database/accounts/syncGJAccountNew.php",
             post(user::load_data),
         )
-        .route("/updateGJUserScore22.php", post(user::update_data))
+        .route("/updateGJUserScore22.php", post(user::update_stats))
         .route("/getGJUserInfo20.php", post(user::info))
 }

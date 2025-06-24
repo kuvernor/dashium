@@ -9,7 +9,118 @@ use sha1::{Digest, Sha1};
 use sqlx::{FromRow, PgPool};
 
 #[derive(Serialize, Deserialize, Debug, FromRow, GDResponse)]
-pub struct User {}
+pub struct User {
+    #[response(1)]
+    username: String,
+
+    #[response(2)]
+    id: i32,
+
+    #[response(3)]
+    stars: i32,
+
+    #[response(4)]
+    demons: i32,
+
+    #[response(8)]
+    creator_points: i32,
+
+    #[response(10)]
+    color1: i16,
+
+    #[response(11)]
+    color2: i16,
+
+    #[response(13)]
+    coins: i32,
+
+    #[response(16)]
+    account_id: i32,
+
+    #[response(17)]
+    user_coins: i32,
+
+    #[response(18)]
+    message_setting: i16,
+
+    #[response(19)]
+    friend_setting: i16,
+
+    #[response(20)]
+    youtube: String,
+
+    #[response(21)]
+    icon: i16,
+
+    #[response(22)]
+    ship: i16,
+
+    #[response(23)]
+    ball: i16,
+
+    #[response(24)]
+    ufo: i16,
+
+    #[response(25)]
+    wave: i16,
+
+    #[response(26)]
+    robot: i16,
+
+    #[response(28)]
+    glow: i16,
+
+    #[response(29)]
+    is_activated: i16,
+
+    #[response(30)]
+    rank: i32,
+
+    #[response(31)]
+    friend_state: i16,
+
+    #[response(43)]
+    spider: i16,
+
+    #[response(44)]
+    twitter: String,
+
+    #[response(45)]
+    twitch: String,
+
+    #[response(46)]
+    diamonds: i32,
+
+    #[response(48)]
+    explosion: i16,
+
+    #[response(49)]
+    mod_level: i16,
+
+    #[response(50)]
+    comment_setting: i16,
+
+    #[response(51)]
+    color3: i16,
+
+    #[response(52)]
+    moons: i32,
+
+    #[response(53)]
+    swing: i16,
+
+    #[response(54)]
+    jetpack: i16,
+
+    #[response(55)]
+    demon_info: String,
+
+    #[response(56)]
+    level_info: String,
+
+    #[response(57)]
+    platformer_info: String,
+}
 
 impl User {
     pub fn generate_gjp2(password: &str) -> String {
@@ -122,7 +233,56 @@ impl User {
         Ok(save_data)
     }
 
-    pub fn to_gd(&self) -> String {
-        self.to_gd_response(":")
+    pub async fn to_gd(pool: &PgPool, user_id: i32) -> Result<String> {
+        let user: Self = sqlx::query_as!(
+            Self,
+            r#"
+            SELECT
+                username,
+                id,
+                stars,
+                demons,
+                creator_points,
+                color1,
+                color2,
+                coins,
+                account_id,
+                user_coins,
+                message_setting,
+                friend_setting,
+                youtube,
+                icon,
+                ship,
+                ball,
+                ufo,
+                wave,
+                robot,
+                glow,
+                is_activated,
+                rank,
+                friend_state,
+                spider,
+                twitter,
+                twitch,
+                diamonds,
+                explosion,
+                mod_level,
+                comment_setting,
+                color3,
+                moons,
+                swing,
+                jetpack,
+                demon_info,
+                level_info,
+                platformer_info
+            FROM users
+            WHERE id = $1
+            "#,
+            user_id
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(user.to_gd_response(":"))
     }
 }

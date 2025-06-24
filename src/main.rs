@@ -20,8 +20,8 @@ async fn main() -> Result<()> {
     setup_logging();
     let pool = setup_db().await?;
     let app = setup_app(pool);
-    let listener = TcpListener::bind("localhost:2207").await?;
-    info!("Server running at http://localhost:2207");
+    let listener = TcpListener::bind("127.0.0.1:2207").await?;
+    info!("Server running at http://127.0.0.1:2207");
 
     axum::serve(listener, app).await?;
     Ok(())
