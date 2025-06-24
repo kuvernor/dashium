@@ -5,6 +5,7 @@ use tracing::{debug, info};
 
 use crate::AppError;
 use crate::models::User;
+use crate::util::verify_gjp2;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginForm {
@@ -25,9 +26,8 @@ pub async fn login(
     let gjp2 = &form.gjp2;
 
     let user_id = User::get_user_id(&pool, username).await?;
-    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
 
-    if !verified {
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
         debug!("{username} failed to login: incorrect username or password");
         return Ok(String::from("-11"));
     }

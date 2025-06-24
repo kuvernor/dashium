@@ -4,7 +4,7 @@ use sqlx::PgPool;
 use tracing::info;
 
 use crate::AppError;
-use crate::models::User;
+use crate::util::verify_gjp2;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 
 #[derive(Serialize, Debug, DeserializeFirstDuplicate)]
@@ -118,7 +118,7 @@ pub async fn update_stats(
     let demon_info = "0,0,0,0,0,0,0,0,0,0,0,0";
     let platformer_info = "0,0,0,0,0,0";
 
-    if !User::verify_gjp2(&pool, user_id, gjp2).await? {
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 

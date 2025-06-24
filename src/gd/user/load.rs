@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::User};
+use crate::{AppError, models::User, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct LoadForm {
@@ -27,8 +27,7 @@ pub async fn load_data(
     let user_id = form.user_id;
     let gjp2 = &form.gjp2;
 
-    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
-    if !verified {
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok(String::from("-1"));
     }
 

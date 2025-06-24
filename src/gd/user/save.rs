@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::User};
+use crate::{AppError, models::User, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SaveForm {
@@ -28,8 +28,7 @@ pub async fn save_data(
     let gjp2 = &form.gjp2;
     let save_data = &form.save_data;
 
-    let verified = User::verify_gjp2(&pool, user_id, gjp2).await?;
-    if !verified {
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
