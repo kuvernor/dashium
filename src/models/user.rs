@@ -34,6 +34,9 @@ pub struct User {
     #[response(13)]
     coins: i32,
 
+    #[response(14)]
+    icon_type: i16,
+
     #[response(16)]
     account_id: i32,
 
@@ -233,6 +236,44 @@ impl User {
         Ok(save_data)
     }
 
+    /// Searches for users and returns a list of user objects.
+    pub async fn search(pool: &PgPool, search: &str, page: i32) -> Result<String> {
+        // get a list of user IDs that match the search term
+        let ids: Vec<i32> = sqlx::query_scalar!(
+            "SELECT id FROM users WHERE username ILIKE '%' || $1 || '%'",
+            search
+        )
+        .fetch_all(pool)
+        .await?;
+
+        let offset = page * 10;
+        let count = ids.len();
+        let end_string = format!("#{}:{}", count, offset);
+
+        let mut response = String::new();
+
+        // for each id, get the user object string and append it to the response
+        for id in ids {
+            let user = User::to_gd(pool, id).await?;
+            response.push_str(&user);
+
+            // separate user objects with `|`
+            response.push('|');
+        }
+
+        // if no users were found
+        if response.is_empty() {
+            return Ok("".to_string());
+        }
+
+        // remove the last `|`
+        response.pop();
+
+        response.push_str(&end_string);
+        Ok(response)
+    }
+
+    /// Creates a GD user object
     pub async fn to_gd(pool: &PgPool, user_id: i32) -> Result<String> {
         let user: Self = sqlx::query_as!(
             Self,
@@ -250,6 +291,7 @@ impl User {
                 user_coins,
                 message_setting,
                 friend_setting,
+                icon_type,
                 youtube,
                 icon,
                 ship,
