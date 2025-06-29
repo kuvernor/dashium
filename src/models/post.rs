@@ -52,10 +52,10 @@ impl Post {
         Ok(response.to_string())
     }
 
-    pub async fn delete(pool: &PgPool, comment_id: i32, user_id: i32) -> Result<()> {
+    pub async fn delete(pool: &PgPool, post_id: i32, user_id: i32) -> Result<()> {
         sqlx::query!(
             "DELETE FROM posts WHERE post_id = $1 and user_id = $2",
-            comment_id,
+            post_id,
             user_id
         )
         .execute(pool)

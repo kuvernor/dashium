@@ -1,6 +1,7 @@
 use axum::{Router, routing::post};
 use sqlx::PgPool;
 
+pub mod message;
 pub mod post;
 pub mod user;
 
@@ -24,4 +25,9 @@ pub fn routes() -> Router<PgPool> {
         .route("/getGJAccountComments20.php", post(post::get_posts))
         .route("/uploadGJAccComment20.php", post(post::upload_post))
         .route("/deleteGJAccComment20.php", post(post::delete_post))
+        // Messages
+        .route("/uploadGJMessage20.php", post(message::send_message))
+        .route("/getGJMessages20.php", post(message::get_messages))
+        .route("/downloadGJMessage20.php", post(message::download_message))
+        .route("/deleteGJMessages20.php", post(message::delete_message))
 }

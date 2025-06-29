@@ -1,12 +1,12 @@
 use axum::{Form, extract::State};
-use serde::Serialize;
-use serde_deserialize_duplicates::DeserializeFirstDuplicate;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::AppError;
-use crate::models::Post;
+use crate::models::Message;
+use crate::util::verify_gjp2;
 
-#[derive(Serialize, DeserializeFirstDuplicate, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GetForm {
     #[serde(rename = "accountID")]
     user_id: i32,
@@ -25,25 +25,41 @@ pub struct GetForm {
     secret: String,
     uuid: String,
     udid: String,
+
+    #[serde(rename = "getSent")]
+    #[serde(default)]
+    get_sent: i16,
 }
 
-pub async fn get_posts(
+pub async fn get_messages(
     State(pool): State<PgPool>,
     Form(form): Form<GetForm>,
 ) -> Result<String, AppError> {
     let user_id = form.user_id;
+    let gjp2 = &form.gjp2;
     let page = form.page;
+    let get_sent = form.get_sent;
 
-    let posts: Vec<Post> = Post::get_posts(&pool, user_id).await?;
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
+        return Ok("-1".to_string());
+    }
+
+    let messages: Vec<Message>;
+
+    if get_sent == 1 {
+        messages = Message::get_sent_messages(&pool, user_id).await?;
+    } else {
+        messages = Message::get_messages(&pool, user_id).await?;
+    }
 
     let offset = page * 10;
-    let count = posts.len();
+    let count = messages.len();
     let end_string = format!("#{}:{}", count, offset);
 
     let mut response = String::new();
 
-    for post in posts {
-        let temp = Post::to_gd(post);
+    for message in messages {
+        let temp = Message::to_gd(message);
         response.push_str(&temp);
         response.push('|');
     }

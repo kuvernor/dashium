@@ -192,11 +192,20 @@ impl User {
     }
 
     pub async fn get_user_id(pool: &PgPool, username: &str) -> Result<i32> {
-        let user_id: i32 =
+        let user_id =
             sqlx::query_scalar!("SELECT user_id FROM users WHERE username = $1", username)
                 .fetch_one(pool)
                 .await?;
         Ok(user_id)
+    }
+
+    pub async fn get_username(pool: &PgPool, user_id: i32) -> Result<String> {
+        let username =
+            sqlx::query_scalar!("SELECT username FROM users WHERE user_id = $1", user_id)
+                .fetch_one(pool)
+                .await?;
+
+        Ok(username)
     }
 
     pub async fn create(pool: &PgPool, username: &str, password: &str, email: &str) -> Result<()> {
