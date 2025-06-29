@@ -8,16 +8,21 @@ use crate::{AppError, models::User, util::verify_gjp2};
 pub struct LoadForm {
     #[serde(rename = "accountID")]
     user_id: i32,
+
     gjp2: String,
+
     #[serde(rename = "gameVersion")]
     game_version: i16,
+
     #[serde(rename = "binaryVersion")]
     binary_version: i16,
-    #[serde(rename = "saveData")]
-    secret: Option<String>,
-    gdw: Option<String>,
-    udid: Option<String>,
-    uuid: Option<String>,
+
+    #[serde(default)]
+    gdw: String,
+
+    secret: String,
+    udid: String,
+    uuid: String,
 }
 
 pub async fn load_data(
@@ -28,7 +33,7 @@ pub async fn load_data(
     let gjp2 = &form.gjp2;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
-        return Ok(String::from("-1"));
+        return Ok("-1".to_string());
     }
 
     match User::load_data(&pool, user_id).await {

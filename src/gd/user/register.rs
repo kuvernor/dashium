@@ -6,7 +6,7 @@ use tracing::{debug, info};
 
 use crate::AppError;
 use crate::models::User;
-use crate::util::*;
+use crate::util::is_ascii_alphanumeric;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisterForm {
@@ -14,7 +14,7 @@ pub struct RegisterForm {
     username: String,
     password: String,
     email: String,
-    secret: Option<String>,
+    secret: String,
 }
 
 pub async fn register(
@@ -60,7 +60,7 @@ pub async fn register(
         return Ok(String::from("-3"));
     }
 
-    match User::register(&pool, username, password, email).await {
+    match User::create(&pool, username, password, email).await {
         Ok(_) => {
             info!("{username} registered succesfully!");
             return Ok("1".to_string());

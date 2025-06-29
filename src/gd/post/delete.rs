@@ -11,12 +11,16 @@ pub struct DeleteForm {
     #[serde(rename = "accountID")]
     user_id: i32,
     gjp2: String,
+
     #[serde(rename = "commentID")]
-    comment_id: i32,
+    post_id: i32,
+
     #[serde(rename = "gameVersion")]
-    game_version: Option<i16>,
+    game_version: i16,
+
     #[serde(rename = "binaryVersion")]
-    binary_version: Option<i16>,
+    binary_version: i16,
+
     #[serde(default)]
     gdw: u8,
     secret: String,
@@ -28,11 +32,15 @@ pub async fn delete_post(
     State(pool): State<PgPool>,
     Form(form): Form<DeleteForm>,
 ) -> Result<String, AppError> {
-    if !verify_gjp2(&pool, form.user_id, &form.gjp2).await? {
+    let user_id = form.user_id;
+    let post_id = form.post_id;
+    let gjp2 = &form.gjp2;
+
+    if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
-    match Post::delete(&pool, form.comment_id, form.user_id).await {
+    match Post::delete(&pool, post_id, user_id).await {
         Ok(_) => return Ok("1".to_string()),
         Err(_) => return Ok("-1".to_string()),
     };

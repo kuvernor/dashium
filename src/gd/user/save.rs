@@ -9,15 +9,19 @@ pub struct SaveForm {
     #[serde(rename = "accountID")]
     user_id: i32,
     gjp2: String,
+
     #[serde(rename = "gameVersion")]
     game_version: i16,
+
     #[serde(rename = "binaryVersion")]
     binary_version: i16,
+
     #[serde(rename = "saveData")]
     save_data: String,
-    secret: Option<String>,
-    udid: Option<String>,
-    uuid: Option<String>,
+
+    secret: String,
+    udid: String,
+    uuid: String,
 }
 
 pub async fn save_data(
@@ -26,13 +30,13 @@ pub async fn save_data(
 ) -> Result<String, AppError> {
     let user_id = form.user_id;
     let gjp2 = &form.gjp2;
-    let save_data = &form.save_data;
+    let data = &form.save_data;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
-    match User::save_data(&pool, user_id, save_data).await {
+    match User::save_data(&pool, user_id, data).await {
         Ok(_) => return Ok("1".to_string()),
         Err(_) => return Ok("-1".to_string()),
     }

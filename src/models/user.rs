@@ -1,133 +1,205 @@
-use crate::util::{generate_gjp2, hash_gjp2};
 use anyhow::Result;
-use gd_response_derive::GDResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-#[derive(Serialize, Deserialize, Debug, FromRow, GDResponse)]
+use crate::util::{generate_gjp2, hash_gjp2};
+
+#[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct User {
-    #[response(1)]
+    user_id: i32,
     username: String,
-
-    #[response(2)]
-    id: i32,
-
-    #[response(3)]
     stars: i32,
-
-    #[response(4)]
     demons: i32,
-
-    #[response(8)]
     creator_points: i32,
-
-    #[response(10)]
     color1: i16,
-
-    #[response(11)]
     color2: i16,
-
-    #[response(13)]
     coins: i32,
-
-    #[response(14)]
     icon_type: i16,
-
-    #[response(16)]
-    account_id: i32,
-
-    #[response(17)]
     user_coins: i32,
-
-    #[response(18)]
     message_setting: i16,
-
-    #[response(19)]
     friend_setting: i16,
-
-    #[response(20)]
     youtube: String,
-
-    #[response(21)]
     icon: i16,
-
-    #[response(22)]
     ship: i16,
-
-    #[response(23)]
     ball: i16,
-
-    #[response(24)]
     ufo: i16,
-
-    #[response(25)]
     wave: i16,
-
-    #[response(26)]
     robot: i16,
-
-    #[response(28)]
     glow: i16,
-
-    #[response(29)]
     is_activated: i16,
-
-    #[response(30)]
     rank: i32,
-
-    #[response(31)]
-    friend_state: i16,
-
-    #[response(43)]
     spider: i16,
-
-    #[response(44)]
     twitter: String,
-
-    #[response(45)]
     twitch: String,
-
-    #[response(46)]
     diamonds: i32,
-
-    #[response(48)]
     explosion: i16,
-
-    #[response(49)]
     mod_level: i16,
-
-    #[response(50)]
     comment_setting: i16,
-
-    #[response(51)]
     color3: i16,
-
-    #[response(52)]
     moons: i32,
-
-    #[response(53)]
     swing: i16,
-
-    #[response(54)]
     jetpack: i16,
-
-    #[response(55)]
     demon_info: String,
-
-    #[response(56)]
     level_info: String,
-
-    #[response(57)]
     platformer_info: String,
 }
 
 impl User {
-    pub async fn register(
-        pool: &PgPool,
-        username: &str,
-        password: &str,
-        email: &str,
-    ) -> Result<()> {
+    pub fn to_gd(user: User) -> String {
+        let response: Vec<String> = vec![
+            format!("1:{}", user.username),
+            format!("2:{}", user.user_id),
+            format!("3:{}", user.stars),
+            format!("4:{}", user.demons),
+            format!("8:{}", user.creator_points),
+            format!("10:{}", user.color1),
+            format!("11:{}", user.color2),
+            format!("13:{}", user.coins),
+            format!("14:{}", user.icon_type),
+            format!("16:{}", user.user_id),
+            format!("17:{}", user.user_coins),
+            format!("18:{}", user.message_setting),
+            format!("19:{}", user.friend_setting),
+            format!("20:{}", user.youtube),
+            format!("21:{}", user.icon),
+            format!("22:{}", user.ship),
+            format!("23:{}", user.ball),
+            format!("24:{}", user.ufo),
+            format!("25:{}", user.wave),
+            format!("26:{}", user.robot),
+            format!("28:{}", user.glow),
+            format!("29:{}", user.is_activated),
+            format!("30:{}", user.rank),
+            format!("43:{}", user.spider),
+            format!("44:{}", user.twitter),
+            format!("45:{}", user.twitch),
+            format!("46:{}", user.diamonds),
+            format!("48:{}", user.explosion),
+            format!("49:{}", user.mod_level),
+            format!("50:{}", user.comment_setting),
+            format!("51:{}", user.color3),
+            format!("52:{}", user.moons),
+            format!("53:{}", user.swing),
+            format!("54:{}", user.jetpack),
+            format!("55:{}", user.demon_info),
+            format!("56:{}", user.level_info),
+            format!("57:{}", user.platformer_info),
+        ];
+        response.join(":")
+    }
+
+    pub async fn get_user(pool: &PgPool, user_id: i32) -> Result<Self> {
+        let user = sqlx::query_as!(
+            Self,
+            r#"
+            SELECT  
+            user_id,
+            username,
+            stars,
+            demons,
+            creator_points,
+            color1,
+            color2,
+            coins,
+            icon_type,
+            user_coins,
+            message_setting,
+            friend_setting,
+            youtube,
+            icon,
+            ship,
+            ball,
+            ufo,
+            wave,
+            robot,
+            glow,
+            is_activated,
+            rank,
+            spider,
+            twitter,
+            twitch,
+            diamonds,
+            explosion,
+            mod_level,
+            comment_setting,
+            color3,
+            moons,
+            swing,
+            jetpack,
+            demon_info,
+            level_info,
+            platformer_info
+            FROM users WHERE user_id = $1
+            "#,
+            user_id
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(user)
+    }
+
+    pub async fn get_users(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
+        let users: Vec<User> = sqlx::query_as!(
+            User,
+            r#"
+            SELECT  
+            user_id,
+            username,
+            stars,
+            demons,
+            creator_points,
+            color1,
+            color2,
+            coins,
+            icon_type,
+            user_coins,
+            message_setting,
+            friend_setting,
+            youtube,
+            icon,
+            ship,
+            ball,
+            ufo,
+            wave,
+            robot,
+            glow,
+            is_activated,
+            rank,
+            spider,
+            twitter,
+            twitch,
+            diamonds,
+            explosion,
+            mod_level,
+            comment_setting,
+            color3,
+            moons,
+            swing,
+            jetpack,
+            demon_info,
+            level_info,
+            platformer_info
+            FROM users
+            WHERE username ILIKE '%' || $1 || '%'
+            "#,
+            search
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(users)
+    }
+
+    pub async fn get_user_id(pool: &PgPool, username: &str) -> Result<i32> {
+        let user_id: i32 =
+            sqlx::query_scalar!("SELECT user_id FROM users WHERE username = $1", username)
+                .fetch_one(pool)
+                .await?;
+        Ok(user_id)
+    }
+
+    pub async fn create(pool: &PgPool, username: &str, password: &str, email: &str) -> Result<()> {
         let gjp2 = generate_gjp2(password);
         let hash = hash_gjp2(&gjp2)?;
 
@@ -165,128 +237,26 @@ impl User {
         Ok(exists)
     }
 
-    pub async fn get_user_id(pool: &PgPool, username: &str) -> Result<i32> {
-        let user_id: i32 =
-            sqlx::query_scalar!("SELECT id FROM users WHERE username = $1", username)
-                .fetch_one(pool)
-                .await?;
-
-        Ok(user_id)
-    }
-
-    pub async fn save_data(pool: &PgPool, user_id: i32, save_data: &str) -> Result<()> {
+    pub async fn save_data(pool: &PgPool, user_id: i32, data: &str) -> Result<()> {
         sqlx::query!(
             r#"
             UPDATE users
             SET save_data = $1
-            WHERE id = $2
+            WHERE user_id = $2
             "#,
-            save_data,
+            data,
             user_id
         )
         .execute(pool)
         .await?;
-
         Ok(())
     }
 
     pub async fn load_data(pool: &PgPool, user_id: i32) -> Result<String> {
-        let save_data = sqlx::query_scalar!("SELECT save_data FROM users WHERE id = $1", user_id)
+        let data = sqlx::query_scalar!("SELECT save_data FROM users WHERE user_id = $1", user_id)
             .fetch_one(pool)
             .await?;
 
-        Ok(save_data)
-    }
-
-    /// Searches for users and returns a list of user objects.
-    pub async fn search(pool: &PgPool, search: &str, page: i32) -> Result<String> {
-        // get a list of user IDs that match the search term
-        let ids: Vec<i32> = sqlx::query_scalar!(
-            "SELECT id FROM users WHERE username ILIKE '%' || $1 || '%'",
-            search
-        )
-        .fetch_all(pool)
-        .await?;
-
-        let offset = page * 10;
-        let count = ids.len();
-        let end_string = format!("#{}:{}", count, offset);
-
-        let mut response = String::new();
-
-        // for each id, get the user object string and append it to the response
-        for id in ids {
-            let user = User::to_gd(pool, id).await?;
-            response.push_str(&user);
-
-            // separate user objects with `|`
-            response.push('|');
-        }
-
-        // if no users were found
-        if response.is_empty() {
-            return Ok("".to_string());
-        }
-
-        // remove the last `|`
-        response.pop();
-
-        response.push_str(&end_string);
-        Ok(response)
-    }
-
-    /// Creates a GD user object
-    pub async fn to_gd(pool: &PgPool, user_id: i32) -> Result<String> {
-        let user: Self = sqlx::query_as!(
-            Self,
-            r#"
-            SELECT
-                username,
-                id,
-                stars,
-                demons,
-                creator_points,
-                color1,
-                color2,
-                coins,
-                account_id,
-                user_coins,
-                message_setting,
-                friend_setting,
-                icon_type,
-                youtube,
-                icon,
-                ship,
-                ball,
-                ufo,
-                wave,
-                robot,
-                glow,
-                is_activated,
-                rank,
-                friend_state,
-                spider,
-                twitter,
-                twitch,
-                diamonds,
-                explosion,
-                mod_level,
-                comment_setting,
-                color3,
-                moons,
-                swing,
-                jetpack,
-                demon_info,
-                level_info,
-                platformer_info
-            FROM users
-            WHERE id = $1
-            "#,
-            user_id
-        )
-        .fetch_one(pool)
-        .await?;
-
-        Ok(user.to_gd_response(":"))
+        Ok(data)
     }
 }

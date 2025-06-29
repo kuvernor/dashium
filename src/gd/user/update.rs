@@ -11,14 +11,11 @@ use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 pub struct UpdateForm {
     #[serde(rename = "accountID")]
     user_id: i32,
+
     #[serde(rename = "userName")]
     username: String,
-    udid: String,
-    uuid: String,
-    #[serde(default)]
-    gdw: u8,
+
     gjp2: String,
-    secret: String,
     seed: String,
     seed2: String,
 
@@ -27,6 +24,7 @@ pub struct UpdateForm {
     demons: i32,
     diamonds: i32,
     coins: i32,
+
     #[serde(rename = "userCoins")]
     user_coins: i32,
 
@@ -78,6 +76,13 @@ pub struct UpdateForm {
     dinfow: i32,
     #[serde(default)]
     dinfog: i32,
+
+    udid: String,
+    uuid: String,
+    secret: String,
+
+    #[serde(default)]
+    gdw: u8,
 }
 
 pub async fn update_stats(
@@ -155,7 +160,7 @@ pub async fn update_stats(
         demon_info = $24,
         platformer_info = $25
 
-        WHERE id = $26
+        WHERE user_id = $26
         "#,
         stars,
         moons,

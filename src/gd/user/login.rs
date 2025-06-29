@@ -12,10 +12,13 @@ pub struct LoginForm {
     #[serde(rename = "userName")]
     username: String,
     gjp2: String,
+
+    #[serde(default)]
     #[serde(rename = "sID")]
-    steam_id: Option<String>,
-    secret: Option<String>,
-    udid: Option<String>,
+    steam_id: String,
+
+    secret: String,
+    udid: String,
 }
 
 pub async fn login(

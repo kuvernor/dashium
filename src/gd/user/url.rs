@@ -7,9 +7,11 @@ use crate::AppError;
 pub struct UrlForm {
     #[serde(rename = "accountID")]
     user_id: i32,
-    secret: Option<String>,
+    secret: String,
+
+    #[serde(default)]
     #[serde(rename = "type")]
-    endpoint_type: Option<u8>,
+    endpoint_type: u8,
 }
 
 pub async fn url(Form(_form): Form<UrlForm>) -> Result<String, AppError> {

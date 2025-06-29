@@ -1,7 +1,6 @@
 use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::info;
 
 use crate::AppError;
 use crate::models::User;
@@ -10,15 +9,21 @@ use crate::models::User;
 pub struct InfoForm {
     #[serde(rename = "accountID")]
     user_id: i32,
+
     #[serde(rename = "targetAccountID")]
     target_id: i32,
+
     gjp2: String,
 
     #[serde(rename = "gameVersion")]
-    game_version: Option<i16>,
+    game_version: i16,
+
     #[serde(rename = "binaryVersion")]
-    binary_version: Option<i16>,
-    gdw: Option<u8>,
+    binary_version: i16,
+
+    #[serde(default)]
+    gdw: u8,
+
     secret: String,
 }
 
@@ -26,12 +31,10 @@ pub async fn info(
     State(pool): State<PgPool>,
     Form(form): Form<InfoForm>,
 ) -> Result<String, AppError> {
-    let user = User::to_gd(&pool, form.target_id).await?;
+    let user_id = form.user_id;
 
-    info!(
-        "ID {} requested info for ID {}.",
-        form.user_id, form.target_id
-    );
+    let user = User::get_user(&pool, user_id).await?;
+    let response = User::to_gd(user);
 
-    Ok(user)
+    Ok(response)
 }
