@@ -14,16 +14,6 @@ pub struct FriendRequest {
     is_new: i16,
 }
 
-#[allow(unused)]
-pub struct Friendship {
-    friendship_id: i32,
-    user1: i32,
-    pub user2: i32,
-    is_new1: i16,
-    is_new2: i16,
-    created_at: DateTime<Utc>,
-}
-
 impl FriendRequest {
     pub async fn to_gd(pool: &PgPool, friend_request: Self) -> Result<String> {
         let user = User::get_user(pool, friend_request.user_id).await?;
@@ -120,6 +110,16 @@ impl FriendRequest {
     }
 }
 
+#[allow(unused)]
+pub struct Friendship {
+    friendship_id: i32,
+    user1: i32,
+    pub user2: i32,
+    is_new1: i16,
+    is_new2: i16,
+    created_at: DateTime<Utc>,
+}
+
 impl Friendship {
     pub async fn get_friends(pool: &PgPool, user1: i32) -> Result<Vec<Self>> {
         let friends = sqlx::query_as!(
@@ -163,6 +163,52 @@ impl Friendship {
             user_id,
             target_id
         ).fetch_one(pool).await?;
+
+        Ok(exists)
+    }
+}
+
+#[allow(unused)]
+pub struct Block {
+    block_id: i32,
+    user_id: i32,
+    target_id: i32,
+    created_at: DateTime<Utc>,
+}
+
+impl Block {
+    pub async fn block_user(pool: &PgPool, user_id: i32, target_id: i32) -> Result<()> {
+        sqlx::query!(
+            "INSERT INTO blocks (user1, user2) VALUES ($1, $2)",
+            user_id,
+            target_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn unblock_user(pool: &PgPool, user_id: i32, target_id: i32) -> Result<()> {
+        sqlx::query!(
+            "DELETE FROM blocks WHERE user1 = $1 AND user2 = $2",
+            user_id,
+            target_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn exists(pool: &PgPool, user_id: i32, target_id: i32) -> Result<bool> {
+        let exists = sqlx::query_scalar!(
+            "SELECT EXISTS(SELECT 1 FROM blocks WHERE user1 = $1 AND user2 = $2) AS \"exists!\"",
+            user_id,
+            target_id
+        )
+        .fetch_one(pool)
+        .await?;
 
         Ok(exists)
     }

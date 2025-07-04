@@ -18,3 +18,9 @@ pub use crate::gd::relationship::remove::remove_friend;
 
 pub mod send;
 pub use crate::gd::relationship::send::send_friend_request;
+
+pub mod block;
+pub use crate::gd::relationship::block::block_user;
+
+pub mod unblock;
+pub use crate::gd::relationship::unblock::unblock_user;

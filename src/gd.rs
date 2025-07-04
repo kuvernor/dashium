@@ -54,4 +54,6 @@ pub fn routes() -> Router<PgPool> {
         )
         .route("/getGJUserList20.php", post(relationship::get_user_list))
         .route("/removeGJFriend20.php", post(relationship::remove_friend))
+        .route("/blockGJUser20.php", post(relationship::block_user))
+        .route("/unblockGJUser20.php", post(relationship::unblock_user))
 }

@@ -8,5 +8,6 @@ pub mod message;
 pub use crate::models::message::Message;
 
 pub mod relationship;
+pub use crate::models::relationship::Block;
 pub use crate::models::relationship::FriendRequest;
 pub use crate::models::relationship::Friendship;
