@@ -32,11 +32,15 @@ pub async fn search(
     let search_term = &form.str;
     let page = form.page;
 
-    let users = User::get_users(&pool, search_term).await?;
+    let users: Vec<User> = User::get_users(&pool, search_term).await?;
+
+    if users.is_empty() {
+        return Ok("-2".to_string());
+    }
 
     let offset = page * 10;
     let count = users.len();
-    let end_string = format!("#{}:{}", count, offset);
+    let end_string = format!("#{}:{}:10", count, offset);
 
     let mut response = String::new();
 
@@ -47,12 +51,8 @@ pub async fn search(
         response.push('|');
     }
 
-    if response.is_empty() {
-        return Ok("".to_string());
-    }
-
     response.pop();
-
     response.push_str(&end_string);
+
     Ok(response)
 }

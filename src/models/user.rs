@@ -7,25 +7,26 @@ use crate::util::{generate_gjp2, hash_gjp2};
 #[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct User {
     user_id: i32,
-    username: String,
+    pub username: String,
     stars: i32,
     demons: i32,
     creator_points: i32,
-    color1: i16,
-    color2: i16,
+    pub color1: i16,
+    pub color2: i16,
     coins: i32,
-    icon_type: i16,
+    pub icon_type: i16,
+    display_icon: i16,
     user_coins: i32,
     message_setting: i16,
     friend_setting: i16,
     youtube: String,
-    icon: i16,
+    pub icon: i16,
     ship: i16,
     ball: i16,
     ufo: i16,
     wave: i16,
     robot: i16,
-    glow: i16,
+    pub glow: i16,
     is_activated: i16,
     rank: i32,
     spider: i16,
@@ -52,10 +53,12 @@ impl User {
             format!("3:{}", user.stars),
             format!("4:{}", user.demons),
             format!("8:{}", user.creator_points),
+            format!("9:{}", user.display_icon),
             format!("10:{}", user.color1),
             format!("11:{}", user.color2),
             format!("13:{}", user.coins),
             format!("14:{}", user.icon_type),
+            format!("15:{}", user.glow),
             format!("16:{}", user.user_id),
             format!("17:{}", user.user_coins),
             format!("18:{}", user.message_setting),
@@ -102,6 +105,7 @@ impl User {
             color2,
             coins,
             icon_type,
+            display_icon,
             user_coins,
             message_setting,
             friend_setting,
@@ -153,6 +157,7 @@ impl User {
             color2,
             coins,
             icon_type,
+            display_icon,
             user_coins,
             message_setting,
             friend_setting,
@@ -191,7 +196,7 @@ impl User {
         Ok(users)
     }
 
-    pub async fn get_user_id(pool: &PgPool, username: &str) -> Result<i32> {
+    pub async fn id_from_username(pool: &PgPool, username: &str) -> Result<i32> {
         let user_id =
             sqlx::query_scalar!("SELECT user_id FROM users WHERE username = $1", username)
                 .fetch_one(pool)
@@ -199,7 +204,7 @@ impl User {
         Ok(user_id)
     }
 
-    pub async fn get_username(pool: &PgPool, user_id: i32) -> Result<String> {
+    pub async fn username_from_id(pool: &PgPool, user_id: i32) -> Result<String> {
         let username =
             sqlx::query_scalar!("SELECT username FROM users WHERE user_id = $1", user_id)
                 .fetch_one(pool)

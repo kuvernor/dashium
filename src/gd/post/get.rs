@@ -20,8 +20,6 @@ pub struct GetForm {
     #[serde(rename = "binaryVersion")]
     binary_version: i16,
 
-    #[serde(default)]
-    gdw: u8,
     secret: String,
     uuid: String,
     udid: String,
@@ -36,9 +34,13 @@ pub async fn get_posts(
 
     let posts: Vec<Post> = Post::get_posts(&pool, user_id).await?;
 
+    if posts.is_empty() {
+        return Ok("#0:0:10".to_string());
+    }
+
     let offset = page * 10;
     let count = posts.len();
-    let end_string = format!("#{}:{}", count, offset);
+    let end_string = format!("#{}:{}:10", count, offset);
 
     let mut response = String::new();
 
@@ -48,11 +50,6 @@ pub async fn get_posts(
         response.push('|');
     }
 
-    if response.is_empty() {
-        return Ok(end_string);
-    }
-
-    // remove the last `|`
     response.pop();
     response.push_str(&end_string);
 

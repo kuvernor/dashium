@@ -43,16 +43,14 @@ impl Message {
         subject: &str,
         body: &str,
     ) -> Result<()> {
-        let is_sender = 1;
-        let username = User::get_username(pool, target_id).await?;
+        let username = User::username_from_id(pool, target_id).await?;
 
         sqlx::query_scalar!(
-            "INSERT INTO messages (user_id, subject, body, username, is_sender, target_id) VALUES ($1, $2, $3, $4, $5, $6)",
+            "INSERT INTO messages (user_id, subject, body, username, target_id) VALUES ($1, $2, $3, $4, $5)",
             user_id,
             subject,
             body,
             username,
-            is_sender,
             target_id
         )
         .execute(pool)
@@ -72,47 +70,66 @@ impl Message {
         .await?;
 
         message.is_read = 1;
+        message.is_sender = 0;
 
         Ok(message)
     }
 
     pub async fn get_messages(pool: &PgPool, user_id: i32) -> Result<Vec<Self>> {
-        let messages =
-            sqlx::query_as!(Self, "SELECT * from messages WHERE target_id = $1", user_id)
-                .fetch_all(pool)
-                .await?;
+        let mut messages = sqlx::query_as!(
+            Self,
+            "SELECT * from messages WHERE target_id = $1 ORDER BY created_at DESC",
+            user_id
+        )
+        .fetch_all(pool)
+        .await?;
+
+        for message in &mut messages {
+            message.is_sender = 0;
+        }
 
         Ok(messages)
     }
 
     pub async fn get_sent_messages(pool: &PgPool, user_id: i32) -> Result<Vec<Self>> {
-        let messages = sqlx::query_as!(
+        let mut messages = sqlx::query_as!(
             Self,
-            "SELECT * FROM messages WHERE user_id = $1 AND is_sender = 1",
-            user_id,
+            "SELECT * FROM messages WHERE user_id = $1 ORDER BY created_at DESC",
+            user_id
         )
         .fetch_all(pool)
         .await?;
 
+        for message in &mut messages {
+            message.is_sender = 1;
+        }
+
         Ok(messages)
     }
 
-    pub async fn delete(pool: &PgPool, message_id: i32, user_id: i32) -> Result<()> {
-        sqlx::query!(
-            "DELETE FROM messages WHERE message_id = $1 AND user_id = $2",
-            message_id,
-            user_id
-        )
-        .execute(pool)
-        .await?;
-
-        sqlx::query!(
-            "DELETE FROM messages WHERE message_id = $1 AND target_id = $2",
-            message_id,
-            user_id
-        )
-        .execute(pool)
-        .await?;
+    pub async fn delete(
+        pool: &PgPool,
+        user_id: i32,
+        message_id: i32,
+        is_sender: bool,
+    ) -> Result<()> {
+        if is_sender {
+            sqlx::query!(
+                "DELETE FROM messages WHERE message_id = $1 AND user_id = $2",
+                message_id,
+                user_id
+            )
+            .execute(pool)
+            .await?;
+        } else {
+            sqlx::query!(
+                "DELETE FROM messages WHERE message_id = $1 AND target_id = $2",
+                message_id,
+                user_id
+            )
+            .execute(pool)
+            .await?;
+        }
 
         Ok(())
     }

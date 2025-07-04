@@ -28,7 +28,7 @@ pub async fn login(
     let username = &form.username;
     let gjp2 = &form.gjp2;
 
-    let user_id = User::get_user_id(&pool, username).await?;
+    let user_id = User::id_from_username(&pool, username).await?;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         debug!("{username} failed to login: incorrect username or password");

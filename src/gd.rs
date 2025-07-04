@@ -3,6 +3,7 @@ use sqlx::PgPool;
 
 pub mod message;
 pub mod post;
+pub mod relationship;
 pub mod user;
 
 pub fn routes() -> Router<PgPool> {
@@ -30,4 +31,27 @@ pub fn routes() -> Router<PgPool> {
         .route("/getGJMessages20.php", post(message::get_messages))
         .route("/downloadGJMessage20.php", post(message::download_message))
         .route("/deleteGJMessages20.php", post(message::delete_message))
+        // Relationships
+        .route(
+            "/uploadFriendRequest20.php",
+            post(relationship::send_friend_request),
+        )
+        .route(
+            "/getGJFriendRequests20.php",
+            post(relationship::get_friend_requests),
+        )
+        .route(
+            "/readGJFriendRequests20.php",
+            post(relationship::read_friend_request),
+        )
+        .route(
+            "/acceptGJFriendRequest20.php",
+            post(relationship::accept_friend_request),
+        )
+        .route(
+            "/deleteGJFriendRequests20.php",
+            post(relationship::delete_friend_request),
+        )
+        .route("/getGJUserList20.php", post(relationship::get_user_list))
+        .route("/removeGJFriend20.php", post(relationship::remove_friend))
 }

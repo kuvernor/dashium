@@ -2,26 +2,23 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::AppError;
-use crate::models::Message;
-use crate::util::verify_gjp2;
+use crate::{AppError, models::FriendRequest, util::verify_gjp2};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct DeleteForm {
     #[serde(rename = "accountID")]
     user_id: i32,
+
     gjp2: String,
 
     #[serde(default)]
-    #[serde(rename = "messages")]
-    message_ids: String,
+    #[serde(rename = "accounts")]
+    target_ids: String,
 
-    #[serde(default)]
-    #[serde(rename = "messageID")]
-    message_id: i32,
+    #[serde(rename = "targetAccountID")]
+    target_id: i32,
 
     #[serde(rename = "isSender")]
-    #[serde(default)]
     is_sender: i16,
 
     #[serde(rename = "gameVersion")]
@@ -31,45 +28,45 @@ pub struct DeleteForm {
     binary_version: i16,
 
     secret: String,
-    uuid: String,
     udid: String,
+    uuid: String,
 }
 
-pub async fn delete_message(
+pub async fn delete_friend_request(
     State(pool): State<PgPool>,
     Form(form): Form<DeleteForm>,
 ) -> Result<String, AppError> {
     let user_id = form.user_id;
     let gjp2 = &form.gjp2;
-    let message_id = form.message_id;
-    let message_ids = form.message_ids;
+    let target_id = form.target_id;
+    let target_ids = &form.target_ids;
     let is_sender = form.is_sender;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("1".to_string());
     }
 
-    if message_ids.is_empty() {
+    if target_ids.is_empty() {
         match is_sender {
-            0 => Message::delete(&pool, user_id, message_id, false).await?,
-            1 => Message::delete(&pool, user_id, message_id, true).await?,
+            0 => FriendRequest::delete(&pool, target_id, user_id, false).await?,
+            1 => FriendRequest::delete(&pool, user_id, target_id, true).await?,
             _ => (),
         }
     } else {
-        let message_ids: Vec<i32> = message_ids
+        let target_ids: Vec<i32> = target_ids
             .split(',')
             .filter_map(|s| s.trim().parse().ok())
             .collect();
 
         match is_sender {
             0 => {
-                for message_id in message_ids {
-                    Message::delete(&pool, user_id, message_id, false).await?;
+                for target_id in target_ids {
+                    FriendRequest::delete(&pool, target_id, user_id, false).await?;
                 }
             }
             1 => {
-                for message_id in message_ids {
-                    Message::delete(&pool, user_id, message_id, true).await?;
+                for target_id in target_ids {
+                    FriendRequest::delete(&pool, user_id, target_id, true).await?;
                 }
             }
             _ => (),

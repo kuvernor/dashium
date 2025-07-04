@@ -2,17 +2,20 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::AppError;
-use crate::models::Message;
-use crate::util::verify_gjp2;
+use crate::{AppError, models::FriendRequest, util::verify_gjp2};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
     #[serde(rename = "accountID")]
     user_id: i32,
+
     gjp2: String,
     page: i32,
     total: i32,
+
+    #[serde(default)]
+    #[serde(rename = "getSent")]
+    get_sent: i16,
 
     #[serde(rename = "gameVersion")]
     game_version: i16,
@@ -21,15 +24,11 @@ pub struct GetForm {
     binary_version: i16,
 
     secret: String,
-    uuid: String,
     udid: String,
-
-    #[serde(rename = "getSent")]
-    #[serde(default)]
-    get_sent: i16,
+    uuid: String,
 }
 
-pub async fn get_messages(
+pub async fn get_friend_requests(
     State(pool): State<PgPool>,
     Form(form): Form<GetForm>,
 ) -> Result<String, AppError> {
@@ -42,25 +41,25 @@ pub async fn get_messages(
         return Ok("-1".to_string());
     }
 
-    let messages: Vec<Message>;
+    let friend_requests: Vec<FriendRequest>;
 
     match get_sent {
-        1 => messages = Message::get_sent_messages(&pool, user_id).await?,
-        _ => messages = Message::get_messages(&pool, user_id).await?,
+        1 => friend_requests = FriendRequest::get_all_sent(&pool, user_id).await?,
+        _ => friend_requests = FriendRequest::get_all(&pool, user_id).await?,
     }
 
-    if messages.is_empty() {
+    if friend_requests.is_empty() {
         return Ok("-2".to_string());
     }
 
     let offset = page * 10;
-    let count = messages.len();
-    let end_string = format!("#{}:{}:10", count, offset);
+    let count = friend_requests.len();
+    let end_string = format!("#{}:{}:20", count, offset);
 
     let mut response = String::new();
 
-    for message in messages {
-        let temp = Message::to_gd(message);
+    for friend_request in friend_requests {
+        let temp = FriendRequest::to_gd(&pool, friend_request).await?;
         response.push_str(&temp);
         response.push('|');
     }

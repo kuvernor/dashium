@@ -80,9 +80,6 @@ pub struct UpdateForm {
     udid: String,
     uuid: String,
     secret: String,
-
-    #[serde(default)]
-    gdw: u8,
 }
 
 pub async fn update_stats(

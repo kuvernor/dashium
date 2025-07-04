@@ -20,8 +20,6 @@ pub struct DownloadForm {
     #[serde(rename = "binaryVersion")]
     binary_version: i16,
 
-    #[serde(default)]
-    gdw: u8,
     secret: String,
     uuid: String,
     udid: String,
