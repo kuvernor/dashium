@@ -4,7 +4,7 @@ use sqlx::PgPool;
 
 use crate::{
     AppError,
-    models::{Friendship, User},
+    models::{Block, Friendship, User},
     util::verify_gjp2,
 };
 
@@ -15,6 +15,7 @@ pub struct ListForm {
 
     gjp2: String,
 
+    #[serde(default)]
     #[serde(rename = "type")]
     list_type: u8,
 
@@ -35,12 +36,35 @@ pub async fn get_user_list(
 ) -> Result<String, AppError> {
     let user_id = form.user_id;
     let gjp2 = &form.gjp2;
+    let list_type = form.list_type;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
-    let friends: Vec<Friendship> = Friendship::get_friends(&pool, user_id).await?;
+    if list_type == 1 {
+        let blocks: Vec<Block> = Block::get_all(&pool, user_id).await?;
+
+        if blocks.is_empty() {
+            return Ok("-2".to_string());
+        }
+
+        let mut response = String::new();
+
+        for block in blocks {
+            let target = User::get_user(&pool, block.target_id).await?;
+            let temp = User::to_gd(target);
+
+            response.push_str(&temp);
+            response.push('|');
+        }
+
+        response.pop();
+
+        return Ok(response);
+    }
+
+    let friends: Vec<Friendship> = Friendship::get_all(&pool, user_id).await?;
 
     if friends.is_empty() {
         return Ok("-2".to_string());

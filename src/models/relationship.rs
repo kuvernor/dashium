@@ -121,7 +121,7 @@ pub struct Friendship {
 }
 
 impl Friendship {
-    pub async fn get_friends(pool: &PgPool, user1: i32) -> Result<Vec<Self>> {
+    pub async fn get_all(pool: &PgPool, user1: i32) -> Result<Vec<Self>> {
         let friends = sqlx::query_as!(
             Self,
             "SELECT * FROM friendships WHERE user1 = $1 ORDER BY created_at DESC",
@@ -172,14 +172,26 @@ impl Friendship {
 pub struct Block {
     block_id: i32,
     user_id: i32,
-    target_id: i32,
+    pub target_id: i32,
     created_at: DateTime<Utc>,
 }
 
 impl Block {
+    pub async fn get_all(pool: &PgPool, user_id: i32) -> Result<Vec<Self>> {
+        let blocks = sqlx::query_as!(
+            Block,
+            "SELECT * FROM blocks WHERE user_id = $1 ORDER BY created_at DESC",
+            user_id
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(blocks)
+    }
+
     pub async fn block_user(pool: &PgPool, user_id: i32, target_id: i32) -> Result<()> {
         sqlx::query!(
-            "INSERT INTO blocks (user1, user2) VALUES ($1, $2)",
+            "INSERT INTO blocks (user_id, target_id) VALUES ($1, $2)",
             user_id,
             target_id
         )
@@ -191,7 +203,7 @@ impl Block {
 
     pub async fn unblock_user(pool: &PgPool, user_id: i32, target_id: i32) -> Result<()> {
         sqlx::query!(
-            "DELETE FROM blocks WHERE user1 = $1 AND user2 = $2",
+            "DELETE FROM blocks WHERE user_id = $1 AND target_id = $2",
             user_id,
             target_id
         )
@@ -203,7 +215,7 @@ impl Block {
 
     pub async fn exists(pool: &PgPool, user_id: i32, target_id: i32) -> Result<bool> {
         let exists = sqlx::query_scalar!(
-            "SELECT EXISTS(SELECT 1 FROM blocks WHERE user1 = $1 AND user2 = $2) AS \"exists!\"",
+            "SELECT EXISTS(SELECT 1 FROM blocks WHERE user_id = $1 AND target_id = $2) AS \"exists!\"",
             user_id,
             target_id
         )

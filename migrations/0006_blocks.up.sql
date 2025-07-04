@@ -1,6 +1,6 @@
 CREATE TABLE blocks (
     block_id SERIAL PRIMARY KEY,
-    user1 INT NOT NULL,
-    user2 INT NOT NULL,
+    user_id INT NOT NULL,
+    target_id INT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
