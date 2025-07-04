@@ -4,7 +4,7 @@ use sqlx::PgPool;
 
 use crate::{
     AppError,
-    models::{FriendRequest, Friendship},
+    models::{Block, FriendRequest, Friendship},
     util::verify_gjp2,
 };
 
@@ -46,6 +46,10 @@ pub async fn accept_friend_request(
     FriendRequest::delete(&pool, user_id, target_id, false).await?;
 
     if Friendship::exists(&pool, user_id, target_id).await? {
+        return Ok("-1".to_string());
+    }
+
+    if Block::is_blocked(&pool, user_id, target_id).await? {
         return Ok("-1".to_string());
     }
 

@@ -224,4 +224,16 @@ impl Block {
 
         Ok(exists)
     }
+
+    pub async fn is_blocked(pool: &PgPool, user_id: i32, target_id: i32) -> Result<bool> {
+        let is_blocked = sqlx::query_scalar!(
+            "SELECT EXISTS(SELECT 1 FROM blocks WHERE target_id = $1 AND user_id = $2) AS \"is_blocked!\"",
+            user_id,
+            target_id
+        )
+        .fetch_one(pool)
+        .await?;
+
+        Ok(is_blocked)
+    }
 }

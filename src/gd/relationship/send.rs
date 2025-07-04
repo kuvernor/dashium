@@ -2,7 +2,11 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::FriendRequest, util::verify_gjp2};
+use crate::{
+    AppError,
+    models::{Block, FriendRequest},
+    util::verify_gjp2,
+};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SendForm {
@@ -37,6 +41,10 @@ pub async fn send_friend_request(
     let body = &form.body;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
+        return Ok("-1".to_string());
+    }
+
+    if Block::is_blocked(&pool, user_id, target_id).await? {
         return Ok("-1".to_string());
     }
 

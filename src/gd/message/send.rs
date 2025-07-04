@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::AppError;
+use crate::models::Block;
 use crate::models::message::Message;
 use crate::util::verify_gjp2;
 
@@ -40,6 +41,10 @@ pub async fn send_message(
     let target_id = form.target_id;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
+        return Ok("-1".to_string());
+    }
+
+    if Block::is_blocked(&pool, user_id, target_id).await? {
         return Ok("-1".to_string());
     }
 
