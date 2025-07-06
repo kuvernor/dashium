@@ -75,7 +75,7 @@ pub async fn search_levels(
     let mut level_response = String::new();
 
     for level in &levels {
-        let temp = Level::to_gd(level);
+        let temp = Level::to_gd(level, false);
         level_response.push_str(&temp);
         level_response.push('|');
     }

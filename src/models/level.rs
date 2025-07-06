@@ -56,12 +56,11 @@ pub struct Level {
 }
 
 impl Level {
-    pub fn to_gd(level: &Self) -> String {
-        let response = vec![
+    pub fn to_gd(level: &Self, include_level_string: bool) -> String {
+        let mut response = vec![
             format!("1:{}", level.level_id),
             format!("2:{}", level.level_name),
             format!("3:{}", level.description),
-            //format!("4:{}", level.level_string),
             format!("5:{}", level.version),
             format!("6:{}", level.user_id),
             format!("8:{}", level.is_rated),
@@ -72,7 +71,7 @@ impl Level {
             format!("14:{}", level.likes),
             format!("15:{}", level.length),
             format!("16:{}", level.dislikes),
-            format!("17:{}", level.is_demon,),
+            format!("17:{}", level.is_demon),
             format!("18:{}", level.stars),
             format!("19:{}", level.feature_score),
             format!("25:{}", level.is_auto),
@@ -99,7 +98,19 @@ impl Level {
             format!("57:{}", level.verification_time),
         ];
 
+        if include_level_string {
+            response.insert(3, format!("4:{}", level.level_string));
+        }
+
         response.join(":")
+    }
+
+    pub async fn get(pool: &PgPool, level_id: i32) -> Result<Self> {
+        let level = sqlx::query_as!(Self, "SELECT * FROM levels WHERE level_id = $1", level_id)
+            .fetch_one(pool)
+            .await?;
+
+        Ok(level)
     }
 
     pub async fn get_all(pool: &PgPool, level_name: &str) -> Result<Vec<Self>> {
