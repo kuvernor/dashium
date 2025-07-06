@@ -9,13 +9,11 @@ use crate::util::verify_gjp2;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginForm {
-    #[serde(rename = "userName")]
-    username: String,
+    userName: String,
     gjp2: String,
 
     #[serde(default)]
-    #[serde(rename = "sID")]
-    steam_id: String,
+    sID: String,
 
     secret: String,
     udid: String,
@@ -25,7 +23,7 @@ pub async fn login(
     State(pool): State<PgPool>,
     Form(form): Form<LoginForm>,
 ) -> Result<String, AppError> {
-    let username = &form.username;
+    let username = &form.userName;
     let gjp2 = &form.gjp2;
 
     let user_id = User::id_from_username(&pool, username).await?;
@@ -36,5 +34,5 @@ pub async fn login(
     }
 
     info!("{username} logged in succesfully!");
-    return Ok(format!("{user_id},{user_id}"));
+    Ok(format!("{user_id},{user_id}"))
 }

@@ -2,7 +2,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-use crate::util::{generate_gjp2, hash_gjp2};
+use crate::util::{hash_gjp2, salt_and_sha1};
 
 #[derive(Serialize, Deserialize, Debug, FromRow)]
 pub struct User {
@@ -214,7 +214,7 @@ impl User {
     }
 
     pub async fn create(pool: &PgPool, username: &str, password: &str, email: &str) -> Result<()> {
-        let gjp2 = generate_gjp2(password);
+        let gjp2 = salt_and_sha1(password, "mI29fmAnxgTs");
         let hash = hash_gjp2(&gjp2)?;
 
         sqlx::query!(

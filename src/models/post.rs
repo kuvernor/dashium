@@ -8,6 +8,7 @@ use sqlx::{PgPool, prelude::FromRow};
 pub struct Post {
     post_id: i32,
     user_id: i32,
+    username: String,
     body: String,
     likes: i32,
     is_spam: i16,
@@ -28,11 +29,12 @@ impl Post {
         response.join("~")
     }
 
-    pub async fn get_posts(pool: &PgPool, user_id: i32) -> Result<Vec<Self>> {
+    pub async fn get_all(pool: &PgPool, user_id: i32, username: &str) -> Result<Vec<Self>> {
         let posts = sqlx::query_as!(
             Self,
-            "SELECT * from posts WHERE user_id = $1 ORDER BY created_at DESC",
-            user_id
+            "SELECT * from posts WHERE user_id = $1 AND username = $2 ORDER BY created_at DESC",
+            user_id,
+            username
         )
         .fetch_all(pool)
         .await?;
@@ -40,11 +42,12 @@ impl Post {
         Ok(posts)
     }
 
-    pub async fn upload(pool: &PgPool, body: &str, user_id: i32) -> Result<String> {
+    pub async fn upload(pool: &PgPool, body: &str, user_id: i32, username: &str) -> Result<String> {
         let response = sqlx::query_scalar!(
-            "INSERT INTO posts (body, user_id) VALUES ($1, $2) RETURNING post_id",
+            "INSERT INTO posts (body, user_id, username) VALUES ($1, $2, $3) RETURNING post_id",
             body,
-            user_id
+            user_id,
+            username
         )
         .fetch_one(pool)
         .await?;

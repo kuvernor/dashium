@@ -6,27 +6,14 @@ use crate::{AppError, models::FriendRequest, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct DeleteForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
+    accountID: i32,
     gjp2: String,
-
     #[serde(default)]
-    #[serde(rename = "accounts")]
-    target_ids: String,
-
-    #[serde(rename = "targetAccountID")]
-    target_id: i32,
-
-    #[serde(rename = "isSender")]
-    is_sender: i16,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    accounts: String,
+    targetAccountID: i32,
+    isSender: i16,
+    gameVersion: i16,
+    binaryVersion: i16,
     secret: String,
     udid: String,
     uuid: String,
@@ -36,11 +23,11 @@ pub async fn delete_friend_request(
     State(pool): State<PgPool>,
     Form(form): Form<DeleteForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
-    let target_id = form.target_id;
-    let target_ids = &form.target_ids;
-    let is_sender = form.is_sender;
+    let target_id = form.targetAccountID;
+    let target_ids = &form.accounts;
+    let is_sender = form.isSender;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("1".to_string());

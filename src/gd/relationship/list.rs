@@ -10,21 +10,13 @@ use crate::{
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ListForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
+    accountID: i32,
     gjp2: String,
-
     #[serde(default)]
     #[serde(rename = "type")]
     list_type: u8,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    gameVersion: i16,
+    binaryVersion: i16,
     secret: String,
     udid: String,
     uuid: String,
@@ -34,7 +26,7 @@ pub async fn get_user_list(
     State(pool): State<PgPool>,
     Form(form): Form<ListForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
     let list_type = form.list_type;
 
@@ -52,7 +44,7 @@ pub async fn get_user_list(
         let mut response = String::new();
 
         for block in blocks {
-            let target = User::get_user(&pool, block.target_id).await?;
+            let target = User::get_user(&pool, block.blocked_id).await?;
             let temp = User::to_gd(target);
 
             response.push_str(&temp);

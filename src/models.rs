@@ -11,3 +11,6 @@ pub mod relationship;
 pub use crate::models::relationship::Block;
 pub use crate::models::relationship::FriendRequest;
 pub use crate::models::relationship::Friendship;
+
+pub mod level;
+pub use crate::models::level::Level;

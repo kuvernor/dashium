@@ -9,62 +9,36 @@ use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 
 #[derive(Serialize, Debug, DeserializeFirstDuplicate)]
 pub struct UpdateForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
-    #[serde(rename = "userName")]
-    username: String,
-
+    accountID: i32,
+    userName: String,
     gjp2: String,
     seed: String,
     seed2: String,
-
     stars: i32,
     moons: i32,
     demons: i32,
     diamonds: i32,
     coins: i32,
-
-    #[serde(rename = "userCoins")]
-    user_coins: i32,
-
+    userCoins: i32,
     color1: i16,
     color2: i16,
     color3: i16,
     special: i16,
-
-    #[serde(rename = "iconType")]
-    icon_type: i16,
-    #[serde(rename = "icon")]
-    display_icon: i16,
-    #[serde(rename = "accIcon")]
+    iconType: i16,
     icon: i16,
-    #[serde(rename = "accShip")]
-    ship: i16,
-    #[serde(rename = "accBall")]
-    ball: i16,
-    #[serde(rename = "accBird")]
-    ufo: i16,
-    #[serde(rename = "accDart")]
-    wave: i16,
-    #[serde(rename = "accRobot")]
-    robot: i16,
-    #[serde(rename = "accSpider")]
-    spider: i16,
-    #[serde(rename = "accExplosion")]
-    explosion: i16,
-    #[serde(rename = "accSwing")]
-    swing: i16,
-    #[serde(rename = "accJetpack")]
-    jetpack: i16,
-    #[serde(rename = "accGlow")]
-    glow: i16,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    accIcon: i16,
+    accShip: i16,
+    accBall: i16,
+    accBird: i16,
+    accDart: i16,
+    accRobot: i16,
+    accSpider: i16,
+    accExplosion: i16,
+    accSwing: i16,
+    accJetpack: i16,
+    accGlow: i16,
+    gameVersion: i16,
+    binaryVersion: i16,
     sinfo: String,
     sinfod: i32,
     sinfog: i32,
@@ -86,7 +60,7 @@ pub async fn update_stats(
     State(pool): State<PgPool>,
     Form(form): Form<UpdateForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
 
     let stars = form.stars;
@@ -94,25 +68,25 @@ pub async fn update_stats(
     let demons = form.demons;
     let diamonds = form.diamonds;
     let coins = form.coins;
-    let user_coins = form.user_coins;
+    let user_coins = form.userCoins;
 
     let color1 = form.color1;
     let color2 = form.color2;
     let color3 = form.color3;
 
-    let icon_type = form.icon_type;
-    let display_icon = form.display_icon;
+    let icon_type = form.iconType;
+    let display_icon = form.icon;
     let icon = form.icon;
-    let ship = form.ship;
-    let ball = form.ball;
-    let ufo = form.ufo;
-    let wave = form.wave;
-    let robot = form.robot;
-    let spider = form.spider;
-    let explosion = form.explosion;
-    let swing = form.swing;
-    let jetpack = form.jetpack;
-    let glow = form.glow;
+    let ship = form.accShip;
+    let ball = form.accBall;
+    let ufo = form.accBird;
+    let wave = form.accDart;
+    let robot = form.accRobot;
+    let spider = form.accSpider;
+    let explosion = form.accExplosion;
+    let swing = form.accSwing;
+    let jetpack = form.accJetpack;
+    let glow = form.accGlow;
 
     let level_info = &form.sinfo;
 

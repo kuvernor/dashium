@@ -10,16 +10,9 @@ pub struct SearchForm {
     str: String,
     page: i32,
     total: i32,
-
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    accountID: i32,
+    gameVersion: i16,
+    binaryVersion: i16,
     udid: String,
     uuid: String,
     secret: String,
@@ -40,7 +33,7 @@ pub async fn search(
 
     let offset = page * 10;
     let count = users.len();
-    let end_string = format!("#{}:{}:10", count, offset);
+    let end_string = format!("#{count}:{offset}:10");
 
     let mut response = String::new();
 

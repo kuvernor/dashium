@@ -10,15 +10,14 @@ pub fn is_ascii_alphanumeric(s: &str) -> bool {
     s.chars().all(|c| c.is_ascii_alphanumeric())
 }
 
-pub fn generate_gjp2(password: &str) -> String {
-    let salt = "mI29fmAnxgTs";
-    let salted_password = password.to_owned() + salt;
+pub fn salt_and_sha1(s: &str, salt: &str) -> String {
+    let salted = s.to_owned() + salt;
 
     let mut hasher = Sha1::new();
-    hasher.update(salted_password);
+    hasher.update(salted);
     let hashed = hasher.finalize();
 
-    format!("{:x}", hashed)
+    format!("{hashed:x}")
 }
 
 /// Hashes a GJP2 with Argon2

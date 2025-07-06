@@ -1,0 +1,10 @@
+CREATE TABLE songs (
+    song_id SERIAL PRIMARY KEY,
+    song_name VARCHAR(100) NOT NULL,
+    artist_id INT NOT NULL,
+    artist_name VARCHAR(100) NOT NULL,
+    size VARCHAR(100) NOT NULL,
+    hash VARCHAR(256) NOT NULL DEFAULT '',
+    is_disabled SMALLINT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

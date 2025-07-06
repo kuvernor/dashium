@@ -10,8 +10,7 @@ use crate::util::is_ascii_alphanumeric;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisterForm {
-    #[serde(rename = "userName")]
-    username: String,
+    userName: String,
     password: String,
     email: String,
     secret: String,
@@ -21,7 +20,7 @@ pub async fn register(
     State(pool): State<PgPool>,
     Form(form): Form<RegisterForm>,
 ) -> Result<String, AppError> {
-    let username = &form.username;
+    let username = &form.userName;
     let password = &form.password;
     let email = &form.email;
 
@@ -63,11 +62,11 @@ pub async fn register(
     match User::create(&pool, username, password, email).await {
         Ok(_) => {
             info!("{username} registered succesfully!");
-            return Ok("1".to_string());
+            Ok("1".to_string())
         }
         Err(_) => {
             debug!("{username} failed to register: server error");
-            return Ok("-1".to_string());
+            Ok("-1".to_string())
         }
-    };
+    }
 }

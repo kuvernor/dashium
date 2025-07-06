@@ -8,42 +8,30 @@ use crate::util::verify_gjp2;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
+    accountID: i32,
+    binaryVersion: i16,
+    gameVersion: i16,
     gjp2: String,
-
-    #[serde(default)]
-    #[serde(rename = "messages")]
-    message_ids: String,
-
-    #[serde(default)]
-    #[serde(rename = "messageID")]
-    message_id: i32,
-
-    #[serde(rename = "isSender")]
-    #[serde(default)]
-    is_sender: i16,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
     secret: String,
-    uuid: String,
     udid: String,
+    uuid: String,
+    #[serde(default)]
+    messages: String,
+    #[serde(default)]
+    messageID: i32,
+    #[serde(default)]
+    isSender: i16,
 }
 
 pub async fn delete_message(
     State(pool): State<PgPool>,
     Form(form): Form<DeleteForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
-    let message_id = form.message_id;
-    let message_ids = form.message_ids;
-    let is_sender = form.is_sender;
+    let message_id = form.messageID;
+    let message_ids = form.messages;
+    let is_sender = form.isSender;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("1".to_string());

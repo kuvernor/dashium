@@ -6,17 +6,10 @@ use crate::{AppError, models::User, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct LoadForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
+    accountID: i32,
     gjp2: String,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    gameVersion: i16,
+    binaryVersion: i16,
     secret: String,
     udid: String,
     uuid: String,
@@ -26,7 +19,7 @@ pub async fn load_data(
     State(pool): State<PgPool>,
     Form(form): Form<LoadForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
@@ -35,6 +28,6 @@ pub async fn load_data(
 
     match User::load_data(&pool, user_id).await {
         Ok(save_data) => Ok(format!("{save_data};21;30;a;a")),
-        Err(_) => return Ok("-1".to_string()),
+        Err(_) => Ok("-1".to_string()),
     }
 }

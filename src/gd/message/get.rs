@@ -8,46 +8,37 @@ use crate::util::verify_gjp2;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
+    accountID: i32,
     gjp2: String,
     page: i32,
     total: i32,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    gameVersion: i16,
+    binaryVersion: i16,
     secret: String,
     uuid: String,
     udid: String,
 
-    #[serde(rename = "getSent")]
     #[serde(default)]
-    get_sent: i16,
+    getSent: i16,
 }
 
 pub async fn get_messages(
     State(pool): State<PgPool>,
     Form(form): Form<GetForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
+    let user_id = form.accountID;
     let gjp2 = &form.gjp2;
     let page = form.page;
-    let get_sent = form.get_sent;
+    let get_sent = form.getSent;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
-    let messages: Vec<Message>;
-
-    match get_sent {
-        1 => messages = Message::get_sent_messages(&pool, user_id).await?,
-        _ => messages = Message::get_messages(&pool, user_id).await?,
-    }
+    let messages: Vec<Message> = match get_sent {
+        1 => Message::get_sent_messages(&pool, user_id).await?,
+        _ => Message::get_messages(&pool, user_id).await?,
+    };
 
     if messages.is_empty() {
         return Ok("-2".to_string());
@@ -55,7 +46,7 @@ pub async fn get_messages(
 
     let offset = page * 10;
     let count = messages.len();
-    let end_string = format!("#{}:{}:10", count, offset);
+    let end_string = format!("#{count}:{offset}:10");
 
     let mut response = String::new();
 

@@ -10,22 +10,12 @@ use crate::{
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct AcceptForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
-
-    #[serde(rename = "targetAccountID")]
-    target_id: i32,
+    accountID: i32,
+    targetAccountID: i32,
     gjp2: String,
-
-    #[serde(rename = "requestID")]
-    friend_request_id: i32,
-
-    #[serde(rename = "gameVersion")]
-    game_version: i16,
-
-    #[serde(rename = "binaryVersion")]
-    binary_version: i16,
-
+    requestID: i32,
+    gameVersion: i16,
+    binaryVersion: i16,
     secret: String,
     udid: String,
     uuid: String,
@@ -35,8 +25,8 @@ pub async fn accept_friend_request(
     State(pool): State<PgPool>,
     Form(form): Form<AcceptForm>,
 ) -> Result<String, AppError> {
-    let user_id = form.user_id;
-    let target_id = form.target_id;
+    let user_id = form.accountID;
+    let target_id = form.targetAccountID;
     let gjp2 = &form.gjp2;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
@@ -54,7 +44,7 @@ pub async fn accept_friend_request(
     }
 
     match Friendship::create(&pool, user_id, target_id).await {
-        Ok(_) => return Ok("1".to_string()),
-        Err(_) => return Ok("-1".to_string()),
+        Ok(_) => Ok("1".to_string()),
+        Err(_) => Ok("-1".to_string()),
     }
 }

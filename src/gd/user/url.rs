@@ -5,8 +5,7 @@ use crate::AppError;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct UrlForm {
-    #[serde(rename = "accountID")]
-    user_id: i32,
+    accountID: i32,
     secret: String,
 
     #[serde(default)]

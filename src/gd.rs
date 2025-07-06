@@ -1,6 +1,9 @@
+#![allow(non_snake_case)]
+
 use axum::{Router, routing::post};
 use sqlx::PgPool;
 
+pub mod level;
 pub mod message;
 pub mod post;
 pub mod relationship;
@@ -56,4 +59,7 @@ pub fn routes() -> Router<PgPool> {
         .route("/removeGJFriend20.php", post(relationship::remove_friend))
         .route("/blockGJUser20.php", post(relationship::block_user))
         .route("/unblockGJUser20.php", post(relationship::unblock_user))
+        // Levels
+        .route("/uploadGJLevel21.php", post(level::upload_level))
+        .route("/getGJLevels21.php", post(level::search_levels))
 }
