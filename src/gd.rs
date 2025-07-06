@@ -5,6 +5,7 @@ use sqlx::PgPool;
 
 pub mod level;
 pub mod message;
+pub mod moderator;
 pub mod post;
 pub mod relationship;
 pub mod user;
@@ -63,4 +64,6 @@ pub fn routes() -> Router<PgPool> {
         .route("/uploadGJLevel21.php", post(level::upload_level))
         .route("/getGJLevels21.php", post(level::search_levels))
         .route("/downloadGJLevel22.php", post(level::download_level))
+        // Moderator
+        .route("/requestUserAccess.php", post(moderator::request_moderator))
 }
