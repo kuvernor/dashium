@@ -14,3 +14,6 @@ pub use crate::models::relationship::Friendship;
 
 pub mod level;
 pub use crate::models::level::Level;
+
+pub mod comment;
+pub use crate::models::comment::Comment;

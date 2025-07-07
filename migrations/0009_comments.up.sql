@@ -1,0 +1,15 @@
+CREATE TABLE comments (
+    comment_id SERIAL PRIMARY KEY,
+    level_id INT NOT NULL,
+    user_id INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    comment TEXT NOT NULL,
+    likes INT NOT NULL DEFAULT 0,
+    is_spam SMALLINT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    percent SMALLINT NOT NULL DEFAULT 0,
+    chat_color VARCHAR(30) NOT NULL DEFAULT '255,255,255',
+
+    FOREIGN KEY (user_id) REFERENCES users (user_id),
+    FOREIGN KEY (level_id) REFERENCES levels (level_id)
+);

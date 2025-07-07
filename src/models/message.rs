@@ -1,12 +1,12 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{PgPool, prelude::FromRow};
 
 use crate::models::User;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, FromRow)]
+#[allow(dead_code)]
 pub struct Message {
     message_id: i32,
     sender_id: i32,

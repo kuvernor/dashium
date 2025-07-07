@@ -3,6 +3,7 @@
 use axum::{Router, routing::post};
 use sqlx::PgPool;
 
+pub mod comment;
 pub mod level;
 pub mod message;
 pub mod moderator;
@@ -66,4 +67,7 @@ pub fn routes() -> Router<PgPool> {
         .route("/downloadGJLevel22.php", post(level::download_level))
         // Moderator
         .route("/requestUserAccess.php", post(moderator::request_moderator))
+        // Comments
+        .route("/uploadGJComment21.php", post(comment::upload_comment))
+        .route("/getGJComments21.php", post(comment::get_comments))
 }

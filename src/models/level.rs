@@ -1,10 +1,10 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
-use sqlx::PgPool;
+use sqlx::{PgPool, prelude::FromRow};
 
-#[derive(Debug)]
-#[allow(unused)]
+#[derive(Debug, FromRow)]
+#[allow(dead_code)]
 pub struct Level {
     pub level_id: i32,
     pub level_name: String,
@@ -123,5 +123,16 @@ impl Level {
         .await?;
 
         Ok(level)
+    }
+
+    pub async fn update_downloads(pool: &PgPool, level_id: i32) -> Result<()> {
+        sqlx::query!(
+            "UPDATE levels SET downloads = downloads + 1 WHERE level_id = $1",
+            level_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }

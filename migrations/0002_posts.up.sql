@@ -3,7 +3,7 @@ CREATE TABLE posts (
     user_id INT NOT NULL,
     username VARCHAR(50) NOT NULL,
     body TEXT NOT NULL,
-    likes INT NOT NULL DEFAULT 7,
+    likes INT NOT NULL DEFAULT 0,
     is_spam SMALLINT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     

@@ -2,8 +2,9 @@ use crate::models::User;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
-use sqlx::PgPool;
+use sqlx::{FromRow, PgPool};
 
+#[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct FriendRequest {
     friend_request_id: i32,
@@ -110,6 +111,7 @@ impl FriendRequest {
     }
 }
 
+#[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Friendship {
     friendship_id: i32,
@@ -168,6 +170,7 @@ impl Friendship {
     }
 }
 
+#[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Block {
     block_id: i32,

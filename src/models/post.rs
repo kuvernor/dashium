@@ -1,10 +1,10 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
-use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, prelude::FromRow};
 
-#[derive(Serialize, Deserialize, Debug, FromRow)]
+#[derive(Debug, FromRow)]
+#[allow(unused)]
 pub struct Post {
     post_id: i32,
     user_id: i32,

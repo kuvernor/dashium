@@ -15,8 +15,11 @@ pub struct DownloadForm {
     secret: String,
     udid: String,
     uuid: String,
+    #[serde(default)]
     chk: String,
+    #[serde(default)]
     inc: String,
+    #[serde(default)]
     rs: String,
 }
 
@@ -27,6 +30,9 @@ pub async fn download_level(
     let level_id = form.levelID;
 
     let level = &Level::get(&pool, level_id).await?;
+
+    Level::update_downloads(&pool, level_id).await?;
+
     let hash1 = generate_hash1(&level.level_string);
     let hash2 = generate_hash2(level);
 
