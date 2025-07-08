@@ -1,0 +1,11 @@
+CREATE TABLE map_packs (
+    pack_id SERIAL PRIMARY KEY,
+    pack_name VARCHAR(100) NOT NULL,
+    levels VARCHAR(512) NOT NULL,
+    stars SMALLINT NOT NULL,
+    coins SMALLINT NOT NULL,
+    difficulty SMALLINT NOT NULL,
+    text_color VARCHAR(20) NOT NULL,
+    bar_color VARCHAR(20) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

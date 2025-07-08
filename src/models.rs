@@ -17,3 +17,6 @@ pub use crate::models::level::Level;
 
 pub mod comment;
 pub use crate::models::comment::Comment;
+
+pub mod levelpack;
+pub use crate::models::levelpack::MapPack;

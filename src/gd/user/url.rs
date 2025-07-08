@@ -13,6 +13,6 @@ pub struct UrlForm {
     endpoint_type: u8,
 }
 
-pub async fn url(Form(_form): Form<UrlForm>) -> Result<String, AppError> {
-    Ok("http://127.0.0.1".to_string())
+pub async fn url(Form(_form): Form<UrlForm>) -> Result<&'static str, AppError> {
+    Ok("http://127.0.0.1")
 }
