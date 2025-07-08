@@ -141,4 +141,16 @@ impl Level {
 
         Ok(())
     }
+
+    pub async fn delete(pool: &PgPool, user_id: i32, level_id: i32) -> Result<()> {
+        sqlx::query!(
+            "DELETE FROM levels WHERE user_id = $1 AND level_id = $2",
+            user_id,
+            level_id,
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }

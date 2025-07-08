@@ -10,6 +10,6 @@ CREATE TABLE comments (
     percent SMALLINT NOT NULL DEFAULT 0,
     chat_color VARCHAR(30) NOT NULL DEFAULT '255,255,255',
 
-    FOREIGN KEY (user_id) REFERENCES users (user_id),
-    FOREIGN KEY (level_id) REFERENCES levels (level_id)
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (level_id) REFERENCES levels (level_id) ON DELETE CASCADE
 );
