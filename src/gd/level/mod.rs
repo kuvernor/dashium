@@ -9,3 +9,6 @@ pub use crate::gd::level::download::download_level;
 
 pub mod delete;
 pub use crate::gd::level::delete::delete_level;
+
+pub mod report;
+pub use crate::gd::level::report::report_level;
