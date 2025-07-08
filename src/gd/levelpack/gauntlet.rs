@@ -1,0 +1,57 @@
+use axum::{Form, extract::State};
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+
+use crate::{AppError, models::Gauntlet, util::salt_and_sha1};
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct GetForm {
+    special: u8,
+    gameVersion: i16,
+    binaryVersion: i16,
+    secret: String,
+    udid: String,
+    uuid: String,
+}
+
+pub async fn get_gauntlets(
+    State(pool): State<PgPool>,
+    Form(_form): Form<GetForm>,
+) -> Result<String, AppError> {
+    let gauntlets: Vec<Gauntlet> = Gauntlet::get(&pool).await?;
+
+    if gauntlets.is_empty() {
+        return Ok("-2".to_string());
+    }
+
+    let hash = generate_hash(&gauntlets);
+
+    let mut response = String::new();
+
+    for gauntlet in &gauntlets {
+        let temp = Gauntlet::to_gd(gauntlet);
+        response.push_str(&temp);
+        response.push('|');
+    }
+
+    response.pop();
+    response.push('#');
+    response.push_str(&hash);
+
+    Ok(response)
+}
+
+fn generate_hash(gauntlets: &Vec<Gauntlet>) -> String {
+    let mut hash = String::new();
+
+    for gauntlet in gauntlets {
+        let gauntlet_id = &gauntlet.gauntlet_id.to_string();
+        let levels = &gauntlet.levels;
+
+        hash.push_str(gauntlet_id);
+        hash.push_str(levels);
+    }
+    println!("{hash}");
+
+    salt_and_sha1(&hash, "xI25fpAapCQg")
+}

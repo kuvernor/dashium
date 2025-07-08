@@ -9,6 +9,7 @@ use crate::{AppError, models::Level, util::salt_and_sha1};
 pub struct SearchForm {
     accountID: i32,
     binaryVersion: i16,
+    #[serde(default)]
     coins: i16,
     #[serde(default)]
     completedLevels: String,
@@ -16,9 +17,11 @@ pub struct SearchForm {
     customSong: i32,
     #[serde(default)]
     demonFilter: i16,
+    #[serde(default)]
     diff: String,
     #[serde(default)]
     epic: i16,
+    #[serde(default)]
     featured: i16,
     #[serde(default)]
     followed: String,
@@ -28,6 +31,7 @@ pub struct SearchForm {
     gjp2: String,
     #[serde(default)]
     legendary: i16,
+    #[serde(default)]
     len: String,
     #[serde(default)]
     local: i16,
@@ -35,21 +39,29 @@ pub struct SearchForm {
     mythic: i16,
     #[serde(default)]
     noStar: i16,
+    #[serde(default)]
     onlyCompleted: i16,
+    #[serde(default)]
     original: i16,
+    #[serde(default)]
     page: i32,
     secret: String,
     #[serde(default)]
     song: i32,
     #[serde(default)]
     star: i16,
+    #[serde(default)]
     str: String,
+    #[serde(default)]
     total: i32,
+    #[serde(default)]
     twoPlayer: i16,
     udid: String,
+    #[serde(default)]
     uncompleted: u8,
     uuid: String,
     #[serde(rename = "type")]
+    #[serde(default)]
     list_type: i16,
 }
 

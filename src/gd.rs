@@ -77,4 +77,5 @@ pub fn routes() -> Router<PgPool> {
         .route("/getGJCommentHistory.php", post(comment::get_history))
         // Levelpacks
         .route("/getGJMapPacks21.php", post(levelpack::get_map_packs))
+        .route("/getGJGauntlets21.php", post(levelpack::get_gauntlets))
 }

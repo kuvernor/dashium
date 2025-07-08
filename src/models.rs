@@ -19,4 +19,5 @@ pub mod comment;
 pub use crate::models::comment::Comment;
 
 pub mod levelpack;
+pub use crate::models::levelpack::Gauntlet;
 pub use crate::models::levelpack::MapPack;

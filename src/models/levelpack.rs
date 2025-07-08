@@ -40,3 +40,25 @@ impl MapPack {
         Ok(map_packs)
     }
 }
+
+#[derive(Debug, FromRow)]
+#[allow(dead_code)]
+pub struct Gauntlet {
+    pub gauntlet_id: i32,
+    pub levels: String,
+    pub created_at: DateTime<Utc>,
+}
+
+impl Gauntlet {
+    pub fn to_gd(gauntlet: &Self) -> String {
+        format!("1:{}:3:{}", gauntlet.gauntlet_id, gauntlet.levels)
+    }
+
+    pub async fn get(pool: &PgPool) -> Result<Vec<Self>> {
+        let gauntlets = sqlx::query_as!(Self, "SELECT * FROM gauntlets")
+            .fetch_all(pool)
+            .await?;
+
+        Ok(gauntlets)
+    }
+}

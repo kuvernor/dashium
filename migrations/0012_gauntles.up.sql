@@ -1,0 +1,5 @@
+CREATE TABLE gauntlets (
+    gauntlet_id SERIAL PRIMARY KEY,
+    levels VARCHAR(512) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
