@@ -20,10 +20,9 @@ pub struct Comment {
 }
 
 impl Comment {
-    pub async fn to_gd(pool: &PgPool, comment: &Self) -> Result<String> {
+    pub async fn to_gd(pool: &PgPool, comment: &Self, include_level_id: bool) -> Result<String> {
         let user = User::get_user(pool, comment.user_id).await?;
-        let comment_string = [
-            format!("1~{}", comment.level_id),
+        let mut comment_string = vec![
             format!("2~{}", comment.comment),
             format!("3~{}", comment.user_id),
             format!("4~{}", comment.likes),
@@ -35,6 +34,11 @@ impl Comment {
             format!("11~{}", user.mod_level),
             format!("12~{}", comment.chat_color),
         ];
+
+        if include_level_id {
+            comment_string.insert(0, format!("1~{}", comment.level_id));
+        }
+
         let comment_string = comment_string.join("~");
 
         let user_string = [
@@ -78,6 +82,31 @@ impl Comment {
         Ok(comments)
     }
 
+    pub async fn get_from_user(pool: &PgPool, user_id: i32, mode: u8) -> Result<Vec<Self>> {
+        let comments = match mode {
+            1 => {
+                sqlx::query_as!(
+                    Self,
+                    "SELECT * FROM comments WHERE user_id = $1 ORDER BY likes DESC",
+                    user_id
+                )
+                .fetch_all(pool)
+                .await?
+            }
+            _ => {
+                sqlx::query_as!(
+                    Self,
+                    "SELECT * FROM comments WHERE user_id = $1 ORDER BY created_at DESC",
+                    user_id
+                )
+                .fetch_all(pool)
+                .await?
+            }
+        };
+
+        Ok(comments)
+    }
+
     pub async fn upload(
         pool: &PgPool,
         user_id: i32,
@@ -96,5 +125,18 @@ impl Comment {
         .await?;
 
         Ok(response)
+    }
+
+    pub async fn delete(pool: &PgPool, user_id: i32, level_id: i32, comment_id: i32) -> Result<()> {
+        sqlx::query!(
+            "DELETE FROM comments WHERE user_id = $1 AND level_id = $2 AND comment_id = $3",
+            user_id,
+            level_id,
+            comment_id
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }

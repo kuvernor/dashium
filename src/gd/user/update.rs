@@ -1,7 +1,6 @@
 use axum::{Form, extract::State};
 use serde::Serialize;
 use sqlx::PgPool;
-use tracing::info;
 
 use crate::AppError;
 use crate::util::verify_gjp2;
@@ -163,6 +162,5 @@ pub async fn update_stats(
     .execute(&pool)
     .await?;
 
-    info!("Updated data for {user_id}!");
     Ok(format!("{user_id}"))
 }

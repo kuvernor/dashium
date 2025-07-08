@@ -6,29 +6,27 @@ use crate::{AppError, models::Comment};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
-    accountID: i32,
+    userID: i32,
     gjp2: String,
+    page: i32,
+    mode: u8,
+    total: i32,
     gameVersion: i16,
     binaryVersion: i16,
-    #[serde(default)]
-    count: i32,
-    mode: u8,
-    page: i32,
-    total: i32,
     secret: String,
     udid: String,
     uuid: String,
-    levelID: i32,
 }
-pub async fn get_comments(
+
+pub async fn get_history(
     State(pool): State<PgPool>,
     Form(form): Form<GetForm>,
 ) -> Result<String, AppError> {
-    let level_id = form.levelID;
+    let user_id = form.userID;
     let page = form.page;
     let mode = form.mode;
 
-    let comments: Vec<Comment> = Comment::get_all(&pool, level_id, mode).await?;
+    let comments: Vec<Comment> = Comment::get_from_user(&pool, user_id, mode).await?;
 
     if comments.is_empty() {
         return Ok("-2".to_string());
@@ -41,7 +39,7 @@ pub async fn get_comments(
     let mut response = String::new();
 
     for comment in &comments {
-        let temp = Comment::to_gd(&pool, &comment, false).await?;
+        let temp = Comment::to_gd(&pool, &comment, true).await?;
         response.push_str(&temp);
         response.push('|');
     }

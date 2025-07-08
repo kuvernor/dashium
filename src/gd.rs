@@ -70,4 +70,6 @@ pub fn routes() -> Router<PgPool> {
         // Comments
         .route("/uploadGJComment21.php", post(comment::upload_comment))
         .route("/getGJComments21.php", post(comment::get_comments))
+        .route("/deleteGJComment20.php", post(comment::delete_comment))
+        .route("/getGJCommentHistory.php", post(comment::get_history))
 }
