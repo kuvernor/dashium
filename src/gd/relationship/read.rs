@@ -29,7 +29,7 @@ pub async fn read_friend_request(
     }
 
     sqlx::query!(
-        "UPDATE friend_requests SET is_new = 0 WHERE friend_request_id = $1",
+        "UPDATE friend_requests SET is_new = 0 WHERE id = $1",
         friend_request_id
     )
     .execute(&pool)

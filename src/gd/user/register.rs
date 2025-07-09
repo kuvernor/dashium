@@ -20,7 +20,7 @@ pub async fn register(
     State(pool): State<PgPool>,
     Form(form): Form<RegisterForm>,
 ) -> Result<String, AppError> {
-    let username = &form.userName;
+    let username = &form.userName.to_lowercase();
     let password = &form.password;
     let email = &form.email;
 

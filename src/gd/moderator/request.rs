@@ -26,7 +26,7 @@ pub async fn request_moderator(
         return Ok("-1".to_string());
     }
 
-    let mod_level = sqlx::query_scalar!("SELECT mod_level FROM users WHERE user_id = $1", user_id)
+    let mod_level = sqlx::query_scalar!("SELECT mod_level FROM users WHERE id = $1", user_id)
         .fetch_one(&pool)
         .await?;
 

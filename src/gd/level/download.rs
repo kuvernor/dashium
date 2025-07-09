@@ -68,7 +68,7 @@ pub fn generate_hash2(level: &Level) -> String {
     let user_id = level.user_id;
     let stars = level.stars;
     let is_demon = level.is_demon;
-    let level_id = level.level_id;
+    let level_id = level.id;
     let verified_coins = level.verified_coins;
     let feature_score = level.feature_score;
     let password = &level.password;

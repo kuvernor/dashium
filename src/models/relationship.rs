@@ -7,7 +7,7 @@ use sqlx::{FromRow, PgPool};
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct FriendRequest {
-    friend_request_id: i32,
+    id: i32,
     sender_id: i32,
     recipient_id: i32,
     body: String,
@@ -28,7 +28,7 @@ impl FriendRequest {
             format!("14:{}", user.icon_type),
             format!("15:{}", user.glow),
             format!("16:{}", friend_request.sender_id),
-            format!("32:{}", friend_request.friend_request_id),
+            format!("32:{}", friend_request.id),
             format!("35:{}", friend_request.body),
             format!("37:{}", HumanTime::from(friend_request.created_at)).replace(" ago", ""),
             format!("41:{}", friend_request.is_new),
@@ -114,7 +114,7 @@ impl FriendRequest {
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Friendship {
-    friendship_id: i32,
+    id: i32,
     user1: i32,
     pub user2: i32,
     is_new1: i16,
@@ -173,7 +173,7 @@ impl Friendship {
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Block {
-    block_id: i32,
+    id: i32,
     blocker_id: i32,
     pub blocked_id: i32,
     created_at: DateTime<Utc>,

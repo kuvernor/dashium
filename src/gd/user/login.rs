@@ -23,7 +23,7 @@ pub async fn login(
     State(pool): State<PgPool>,
     Form(form): Form<LoginForm>,
 ) -> Result<String, AppError> {
-    let username = &form.userName;
+    let username = &form.userName.to_lowercase();
     let gjp2 = &form.gjp2;
 
     let user_id = User::id_from_username(&pool, username).await?;

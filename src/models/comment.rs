@@ -7,7 +7,7 @@ use crate::models::User;
 
 #[derive(Debug, FromRow)]
 pub struct Comment {
-    comment_id: i32,
+    id: i32,
     level_id: i32,
     user_id: i32,
     username: String,
@@ -26,7 +26,7 @@ impl Comment {
             format!("2~{}", comment.comment),
             format!("3~{}", comment.user_id),
             format!("4~{}", comment.likes),
-            format!("6~{}", comment.comment_id),
+            format!("6~{}", comment.id),
             format!("7~{}", comment.is_spam),
             format!("8~{}", comment.user_id),
             format!("9~{}", HumanTime::from(comment.created_at)).replace(" ago", ""),
@@ -114,8 +114,8 @@ impl Comment {
         level_id: i32,
         comment: &str,
     ) -> Result<i32> {
-        let response = sqlx::query_scalar!(
-            "INSERT INTO comments (user_id, username, level_id, comment) VALUES ($1, $2, $3, $4) RETURNING comment_id",
+        let comment_id = sqlx::query_scalar!(
+            "INSERT INTO comments (user_id, username, level_id, comment) VALUES ($1, $2, $3, $4) RETURNING id",
             user_id,
             username,
             level_id,
@@ -124,12 +124,12 @@ impl Comment {
         .fetch_one(pool)
         .await?;
 
-        Ok(response)
+        Ok(comment_id)
     }
 
     pub async fn delete(pool: &PgPool, user_id: i32, level_id: i32, comment_id: i32) -> Result<()> {
         sqlx::query!(
-            "DELETE FROM comments WHERE user_id = $1 AND level_id = $2 AND comment_id = $3",
+            "DELETE FROM comments WHERE user_id = $1 AND level_id = $2 AND id = $3",
             user_id,
             level_id,
             comment_id

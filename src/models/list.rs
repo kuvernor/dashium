@@ -5,7 +5,7 @@ use sqlx::{PgPool, prelude::FromRow};
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct List {
-    pub list_id: i32,
+    pub id: i32,
     pub list_name: String,
     pub user_id: i32,
     pub username: String,
@@ -27,7 +27,7 @@ pub struct List {
 impl List {
     pub fn to_gd(list: &Self) -> String {
         let response = [
-            format!("1:{}", list.list_id),
+            format!("1:{}", list.id),
             format!("2:{}", list.list_name),
             format!("3:{}", list.description),
             format!("5:{}", list.version),
@@ -52,7 +52,7 @@ impl List {
 
         let lists = sqlx::query_as!(
             Self,
-            "SELECT * FROM lists WHERE list_name ILIKE '%' || $1 || '%' OR list_id = $2",
+            "SELECT * FROM lists WHERE list_name ILIKE '%' || $1 || '%' OR id = $2",
             search,
             list_id
         )
@@ -64,7 +64,7 @@ impl List {
 
     pub async fn delete(pool: &PgPool, user_id: i32, list_id: i32) -> Result<()> {
         sqlx::query!(
-            "DELETE FROM lists WHERE user_id = $1 AND list_id = $2",
+            "DELETE FROM lists WHERE user_id = $1 AND id = $2",
             user_id,
             list_id
         )

@@ -6,7 +6,7 @@ use sqlx::{PgPool, prelude::FromRow};
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Level {
-    pub level_id: i32,
+    pub id: i32,
     pub level_name: String,
     pub description: String,
     pub username: String,
@@ -58,7 +58,7 @@ pub struct Level {
 impl Level {
     pub fn to_gd(level: &Self, include_level_string: bool) -> String {
         let mut response = vec![
-            format!("1:{}", level.level_id),
+            format!("1:{}", level.id),
             format!("2:{}", level.level_name),
             format!("3:{}", level.description),
             format!("5:{}", level.version),
@@ -106,7 +106,7 @@ impl Level {
     }
 
     pub async fn get(pool: &PgPool, level_id: i32) -> Result<Self> {
-        let level = sqlx::query_as!(Self, "SELECT * FROM levels WHERE level_id = $1", level_id)
+        let level = sqlx::query_as!(Self, "SELECT * FROM levels WHERE id = $1", level_id)
             .fetch_one(pool)
             .await?;
 
@@ -118,7 +118,7 @@ impl Level {
 
         let level = sqlx::query_as!(
             Self,
-            "SELECT * FROM levels WHERE level_name ILIKE '%' || $1 || '%' OR level_id = $2",
+            "SELECT * FROM levels WHERE level_name ILIKE '%' || $1 || '%' OR id = $2",
             search,
             level_id
         )
@@ -130,7 +130,7 @@ impl Level {
 
     pub async fn update_downloads(pool: &PgPool, level_id: i32) -> Result<()> {
         sqlx::query!(
-            "UPDATE levels SET downloads = downloads + 1 WHERE level_id = $1",
+            "UPDATE levels SET downloads = downloads + 1 WHERE id = $1",
             level_id
         )
         .execute(pool)
@@ -141,7 +141,7 @@ impl Level {
 
     pub async fn delete(pool: &PgPool, user_id: i32, level_id: i32) -> Result<()> {
         sqlx::query!(
-            "DELETE FROM levels WHERE user_id = $1 AND level_id = $2",
+            "DELETE FROM levels WHERE user_id = $1 AND id = $2",
             user_id,
             level_id,
         )

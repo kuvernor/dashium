@@ -125,7 +125,7 @@ pub fn generate_hash(levels: &Vec<Level>) -> String {
     let mut hash = String::new();
 
     for level in levels {
-        let level_id = level.level_id.to_string();
+        let level_id = level.id.to_string();
         let first = level_id.chars().next().unwrap_or('0');
         let last = level_id.chars().next_back().unwrap_or('0');
         let stars = level.stars.to_string();

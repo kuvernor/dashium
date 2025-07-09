@@ -130,7 +130,7 @@ pub async fn update_stats(
         demon_info = $24,
         platformer_info = $25
 
-        WHERE user_id = $26
+        WHERE id = $26
         "#,
         stars,
         moons,

@@ -1,5 +1,5 @@
 CREATE TABLE songs (
-    song_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     song_name VARCHAR(100) NOT NULL,
     artist_id INT NOT NULL,
     artist_name VARCHAR(100) NOT NULL,

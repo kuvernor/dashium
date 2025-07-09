@@ -1,5 +1,5 @@
 CREATE TABLE posts (
-    post_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     username VARCHAR(50) NOT NULL,
     body TEXT NOT NULL,
@@ -7,5 +7,5 @@ CREATE TABLE posts (
     is_spam SMALLINT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

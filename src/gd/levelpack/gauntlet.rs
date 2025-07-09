@@ -45,13 +45,12 @@ fn generate_hash(gauntlets: &Vec<Gauntlet>) -> String {
     let mut hash = String::new();
 
     for gauntlet in gauntlets {
-        let gauntlet_id = &gauntlet.gauntlet_id.to_string();
+        let gauntlet_id = &gauntlet.id.to_string();
         let levels = &gauntlet.levels;
 
         hash.push_str(gauntlet_id);
         hash.push_str(levels);
     }
-    println!("{hash}");
 
     salt_and_sha1(&hash, "xI25fpAapCQg")
 }

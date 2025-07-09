@@ -1,5 +1,5 @@
 CREATE TABLE map_packs (
-    pack_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     pack_name VARCHAR(100) NOT NULL,
     levels VARCHAR(512) NOT NULL,
     stars SMALLINT NOT NULL,

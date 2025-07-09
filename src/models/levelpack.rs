@@ -5,7 +5,7 @@ use sqlx::{PgPool, prelude::FromRow};
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct MapPack {
-    pub pack_id: i32,
+    pub id: i32,
     pub pack_name: String,
     pub levels: String,
     pub stars: i32,
@@ -19,7 +19,7 @@ pub struct MapPack {
 impl MapPack {
     pub fn to_gd(map_pack: &Self) -> String {
         let response = [
-            format!("1:{}", map_pack.pack_id),
+            format!("1:{}", map_pack.id),
             format!("2:{}", map_pack.pack_name),
             format!("3:{}", map_pack.levels),
             format!("4:{}", map_pack.stars),
@@ -44,14 +44,14 @@ impl MapPack {
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Gauntlet {
-    pub gauntlet_id: i32,
+    pub id: i32,
     pub levels: String,
     pub created_at: DateTime<Utc>,
 }
 
 impl Gauntlet {
     pub fn to_gd(gauntlet: &Self) -> String {
-        format!("1:{}:3:{}", gauntlet.gauntlet_id, gauntlet.levels)
+        format!("1:{}:3:{}", gauntlet.id, gauntlet.levels)
     }
 
     pub async fn get(pool: &PgPool) -> Result<Vec<Self>> {

@@ -6,7 +6,7 @@ use sqlx::{PgPool, prelude::FromRow};
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Post {
-    post_id: i32,
+    id: i32,
     user_id: i32,
     username: String,
     body: String,
@@ -21,7 +21,7 @@ impl Post {
             format!("2~{}", post.body),
             format!("3~{}", post.user_id),
             format!("4~{}", post.likes),
-            format!("6~{}", post.post_id),
+            format!("6~{}", post.id),
             format!("7~{}", post.is_spam),
             format!("8~{}", post.user_id),
             format!("9~{}", HumanTime::from(post.created_at)).replace(" ago", ""),
@@ -43,8 +43,8 @@ impl Post {
     }
 
     pub async fn upload(pool: &PgPool, body: &str, user_id: i32, username: &str) -> Result<String> {
-        let response = sqlx::query_scalar!(
-            "INSERT INTO posts (body, user_id, username) VALUES ($1, $2, $3) RETURNING post_id",
+        let post_id = sqlx::query_scalar!(
+            "INSERT INTO posts (body, user_id, username) VALUES ($1, $2, $3) RETURNING id",
             body,
             user_id,
             username
@@ -52,12 +52,12 @@ impl Post {
         .fetch_one(pool)
         .await?;
 
-        Ok(response.to_string())
+        Ok(post_id.to_string())
     }
 
     pub async fn delete(pool: &PgPool, post_id: i32, user_id: i32) -> Result<()> {
         sqlx::query!(
-            "DELETE FROM posts WHERE post_id = $1 and user_id = $2",
+            "DELETE FROM posts WHERE id = $1 and user_id = $2",
             post_id,
             user_id
         )

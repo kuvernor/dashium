@@ -5,7 +5,7 @@ use crate::util::{hash_gjp2, salt_and_sha1};
 
 #[derive(Debug, FromRow)]
 pub struct User {
-    user_id: i32,
+    id: i32,
     pub username: String,
     stars: i32,
     demons: i32,
@@ -48,7 +48,7 @@ impl User {
     pub fn to_gd(user: User) -> String {
         let response: Vec<String> = vec![
             format!("1:{}", user.username),
-            format!("2:{}", user.user_id),
+            format!("2:{}", user.id),
             format!("3:{}", user.stars),
             format!("4:{}", user.demons),
             format!("8:{}", user.creator_points),
@@ -58,7 +58,7 @@ impl User {
             format!("13:{}", user.coins),
             format!("14:{}", user.icon_type),
             format!("15:{}", user.glow),
-            format!("16:{}", user.user_id),
+            format!("16:{}", user.id),
             format!("17:{}", user.user_coins),
             format!("18:{}", user.message_setting),
             format!("19:{}", user.friend_setting),
@@ -95,7 +95,7 @@ impl User {
             Self,
             r#"
             SELECT  
-            user_id,
+            id,
             username,
             stars,
             demons,
@@ -132,7 +132,7 @@ impl User {
             demon_info,
             level_info,
             platformer_info
-            FROM users WHERE user_id = $1
+            FROM users WHERE id = $1
             "#,
             user_id
         )
@@ -147,7 +147,7 @@ impl User {
             User,
             r#"
             SELECT  
-            user_id,
+            id,
             username,
             stars,
             demons,
@@ -196,18 +196,16 @@ impl User {
     }
 
     pub async fn id_from_username(pool: &PgPool, username: &str) -> Result<i32> {
-        let user_id =
-            sqlx::query_scalar!("SELECT user_id FROM users WHERE username = $1", username)
-                .fetch_one(pool)
-                .await?;
+        let user_id = sqlx::query_scalar!("SELECT id FROM users WHERE username = $1", username)
+            .fetch_one(pool)
+            .await?;
         Ok(user_id)
     }
 
     pub async fn username_from_id(pool: &PgPool, user_id: i32) -> Result<String> {
-        let username =
-            sqlx::query_scalar!("SELECT username FROM users WHERE user_id = $1", user_id)
-                .fetch_one(pool)
-                .await?;
+        let username = sqlx::query_scalar!("SELECT username FROM users WHERE id = $1", user_id)
+            .fetch_one(pool)
+            .await?;
 
         Ok(username)
     }
@@ -255,7 +253,7 @@ impl User {
             r#"
             UPDATE users
             SET save_data = $1
-            WHERE user_id = $2
+            WHERE id = $2
             "#,
             data,
             user_id
@@ -266,7 +264,7 @@ impl User {
     }
 
     pub async fn load_data(pool: &PgPool, user_id: i32) -> Result<String> {
-        let data = sqlx::query_scalar!("SELECT save_data FROM users WHERE user_id = $1", user_id)
+        let data = sqlx::query_scalar!("SELECT save_data FROM users WHERE id = $1", user_id)
             .fetch_one(pool)
             .await?;
 

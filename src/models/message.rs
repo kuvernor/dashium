@@ -8,7 +8,7 @@ use crate::models::User;
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Message {
-    message_id: i32,
+    id: i32,
     sender_id: i32,
     subject: String,
     body: String,
@@ -22,7 +22,7 @@ pub struct Message {
 impl Message {
     pub fn to_gd(message: Self) -> String {
         let response: Vec<String> = vec![
-            format!("1:{}", message.message_id),
+            format!("1:{}", message.id),
             format!("2:{}", message.sender_id),
             format!("3:{}", message.sender_id),
             format!("4:{}", message.subject),
@@ -62,7 +62,7 @@ impl Message {
     pub async fn download(pool: &PgPool, message_id: i32, sender_id: i32) -> Result<Self> {
         let mut message = sqlx::query_as!(
             Self,
-            "SELECT * FROM messages WHERE message_id = $1 AND sender_id = $2",
+            "SELECT * FROM messages WHERE id = $1 AND sender_id = $2",
             message_id,
             sender_id
         )
@@ -115,7 +115,7 @@ impl Message {
     ) -> Result<()> {
         if is_sender {
             sqlx::query!(
-                "DELETE FROM messages WHERE message_id = $1 AND sender_id = $2",
+                "DELETE FROM messages WHERE id = $1 AND sender_id = $2",
                 message_id,
                 sender_id
             )
@@ -123,7 +123,7 @@ impl Message {
             .await?;
         } else {
             sqlx::query!(
-                "DELETE FROM messages WHERE message_id = $1 AND recipient_id = $2",
+                "DELETE FROM messages WHERE id = $1 AND recipient_id = $2",
                 message_id,
                 sender_id
             )

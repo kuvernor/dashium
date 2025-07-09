@@ -55,7 +55,7 @@ pub async fn upload_list(
             levels
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING list_id
+        RETURNING id
         "#,
         user_id,
         username,

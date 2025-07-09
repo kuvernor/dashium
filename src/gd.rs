@@ -8,6 +8,7 @@ pub mod level;
 pub mod levelpack;
 pub mod list;
 pub mod message;
+pub mod misc;
 pub mod moderator;
 pub mod post;
 pub mod relationship;
@@ -17,7 +18,6 @@ pub fn routes() -> Router<PgPool> {
     Router::new()
         .route("/accounts/registerGJAccount.php", post(user::register))
         .route("/accounts/loginGJAccount.php", post(user::login))
-        .route("/getAccountURL.php", post(user::url))
         .route(
             "/database/accounts/backupGJAccountNew.php",
             post(user::save_data),
@@ -29,6 +29,9 @@ pub fn routes() -> Router<PgPool> {
         .route("/updateGJUserScore22.php", post(user::update_stats))
         .route("/getGJUserInfo20.php", post(user::info))
         .route("/getGJUsers20.php", post(user::search))
+        // Misc
+        .route("/getAccountURL.php", post(misc::url))
+        .route("/likeGJItem211.php", post(misc::like))
         // Posts (aka account comments)
         .route("/getGJAccountComments20.php", post(post::get_posts))
         .route("/uploadGJAccComment20.php", post(post::upload_post))

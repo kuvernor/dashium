@@ -51,7 +51,7 @@ fn generate_hash(map_packs: &Vec<MapPack>) -> String {
     let mut hash = String::new();
 
     for map_pack in map_packs {
-        let pack_id = map_pack.pack_id.to_string();
+        let pack_id = map_pack.id.to_string();
         let first = pack_id.chars().next().unwrap_or('0');
         let last = pack_id.chars().next_back().unwrap_or('0');
 

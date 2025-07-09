@@ -1,5 +1,5 @@
 CREATE TABLE levels (
-    level_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     level_name TEXT NOT NULL,
     description TEXT NOT NULL,
     level_string TEXT NOT NULL,
@@ -50,5 +50,5 @@ CREATE TABLE levels (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
