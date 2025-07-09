@@ -72,7 +72,7 @@ pub async fn search_levels(
     let page = form.page;
     let search = &form.str;
 
-    let levels: Vec<Level> = Level::get_all(&pool, search, search).await?;
+    let levels: Vec<Level> = Level::get_all(&pool, search).await?;
 
     if levels.is_empty() {
         return Ok("-1".to_string());

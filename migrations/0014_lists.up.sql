@@ -1,0 +1,21 @@
+CREATE TABLE lists (
+    list_id SERIAL PRIMARY KEY,
+    list_name VARCHAR(2048) NOT NULL,
+    description VARCHAR(2048) NOT NULL,
+    version INT NOT NULL DEFAULT 1,
+    user_id INT NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    downloads INT NOT NULL DEFAULT 0,
+    difficulty SMALLINT NOT NULL,
+    likes INT NOT NULL DEFAULT 0,
+    is_rated SMALLINT NOT NULL DEFAULT 0,
+    levels VARCHAR(2048) NOT NULL,
+    reward INT NOT NULL DEFAULT 0,
+    requirement INT NOT NULL DEFAULT 1,
+    original INT NOT NULL DEFAULT 0,
+    unlisted SMALLINT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE
+);

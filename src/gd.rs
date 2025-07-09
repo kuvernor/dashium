@@ -6,6 +6,7 @@ use sqlx::PgPool;
 pub mod comment;
 pub mod level;
 pub mod levelpack;
+pub mod list;
 pub mod message;
 pub mod moderator;
 pub mod post;
@@ -79,4 +80,8 @@ pub fn routes() -> Router<PgPool> {
         // Levelpacks
         .route("/getGJMapPacks21.php", post(levelpack::get_map_packs))
         .route("/getGJGauntlets21.php", post(levelpack::get_gauntlets))
+        // Level lists
+        .route("/uploadGJLevelList.php", post(list::upload_list))
+        .route("/getGJLevelLists.php", post(list::get_lists))
+        .route("/deleteGJLevelList.php", post(list::delete_list))
 }

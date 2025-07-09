@@ -8,7 +8,7 @@ CREATE TABLE levels (
     username TEXT NOT NULL,
     user_id INT NOT NULL,
     
-    version INT NOT NULL,
+    version INT NOT NULL DEFAULT 1,
     length SMALLINT NOT NULL DEFAULT 0,
     official_song SMALLINT NOT NULL,
     

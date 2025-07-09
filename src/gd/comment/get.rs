@@ -41,7 +41,7 @@ pub async fn get_comments(
     let mut response = String::new();
 
     for comment in &comments {
-        let temp = Comment::to_gd(&pool, &comment, false).await?;
+        let temp = Comment::to_gd(&pool, comment, false).await?;
         response.push_str(&temp);
         response.push('|');
     }

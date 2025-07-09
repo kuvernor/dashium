@@ -39,7 +39,7 @@ pub async fn get_history(
     let mut response = String::new();
 
     for comment in &comments {
-        let temp = Comment::to_gd(&pool, &comment, true).await?;
+        let temp = Comment::to_gd(&pool, comment, true).await?;
         response.push_str(&temp);
         response.push('|');
     }

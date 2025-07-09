@@ -113,16 +113,13 @@ impl Level {
         Ok(level)
     }
 
-    pub async fn get_all(pool: &PgPool, level_name: &str, level_id: &str) -> Result<Vec<Self>> {
-        let level_id = match level_id.parse::<i32>() {
-            Ok(level_id) => level_id,
-            Err(_) => 0,
-        };
+    pub async fn get_all(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
+        let level_id = search.parse::<i32>().unwrap_or_default();
 
         let level = sqlx::query_as!(
             Self,
             "SELECT * FROM levels WHERE level_name ILIKE '%' || $1 || '%' OR level_id = $2",
-            level_name,
+            search,
             level_id
         )
         .fetch_all(pool)
