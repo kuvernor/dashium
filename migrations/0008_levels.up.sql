@@ -2,7 +2,6 @@ CREATE TABLE levels (
     id SERIAL PRIMARY KEY,
     level_name TEXT NOT NULL,
     description TEXT NOT NULL,
-    level_string TEXT NOT NULL,
     extra_string TEXT NOT NULL,
     level_info TEXT NOT NULL,
     username TEXT NOT NULL,

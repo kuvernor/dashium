@@ -104,7 +104,7 @@ fn level_string(levels: &Vec<Level>) -> String {
     let mut level_string = String::new();
 
     for level in levels {
-        let temp = Level::to_gd(level, false);
+        let temp = Level::to_gd(level);
         level_string.push_str(&temp);
         level_string.push('|');
     }

@@ -1,6 +1,9 @@
 use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use std::path::Path;
+use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
 
 use crate::{AppError, util::verify_gjp2};
 
@@ -88,7 +91,6 @@ pub async fn upload_level(
             level_info,
             length,
             level_name,
-            level_string,
             version,
             objects,
             original,
@@ -125,8 +127,7 @@ pub async fn upload_level(
             $20,
             $21,
             $22,
-            $23,
-            $24
+            $23
         )
         RETURNING id
         "#,
@@ -141,7 +142,6 @@ pub async fn upload_level(
         level_info,
         length,
         level_name,
-        level_string,
         version,
         objects,
         original,
@@ -157,6 +157,12 @@ pub async fn upload_level(
     )
     .fetch_one(&pool)
     .await?;
+
+    let path = format!("./data/levels/{}.level", level_id);
+    let path = Path::new(&path);
+    let mut file = File::create(path).await?;
+    file.write_all(level_string.as_bytes()).await?;
+    file.flush().await?;
 
     Ok(level_id.to_string())
 }

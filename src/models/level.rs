@@ -17,7 +17,6 @@ pub struct Level {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 
-    pub level_string: String,
     pub extra_string: String,
     pub level_info: String,
     pub password: String,
@@ -63,8 +62,8 @@ pub struct SearchParams {
 }
 
 impl Level {
-    pub fn to_gd(level: &Self, include_level_string: bool) -> String {
-        let mut response = vec![
+    pub fn to_gd(level: &Self) -> String {
+        let response = vec![
             format!("1:{}", level.id),
             format!("2:{}", level.level_name),
             format!("3:{}", level.description),
@@ -104,10 +103,6 @@ impl Level {
             format!("53:{}", level.sfx_ids),
             format!("57:{}", level.verification_time),
         ];
-
-        if include_level_string {
-            response.insert(3, format!("4:{}", level.level_string));
-        }
 
         response.join(":")
     }

@@ -1,9 +1,11 @@
+use crate::{AppError, models::Level, util::salt_and_sha1};
 use axum::{Form, extract::State};
 use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::PgPool;
-
-use crate::{AppError, models::Level, util::salt_and_sha1};
+use std::path::Path;
+use tokio::fs::File;
+use tokio::io::AsyncReadExt;
 
 #[derive(DeserializeFirstDuplicate, Serialize, Debug)]
 pub struct DownloadForm {
@@ -31,12 +33,21 @@ pub async fn download_level(
 
     let level = &Level::get(&pool, level_id).await?;
 
+    let path = format!("./data/levels/{}.level", level_id);
+    let path = Path::new(&path);
+    let mut file = File::open(path).await?;
+    let mut level_data = vec![];
+    file.read_to_end(&mut level_data).await?;
+    let level_data = String::from_utf8(level_data)?;
+
+    let level_string = format!("4:{}:{}", level_data, Level::to_gd(&level));
+
     Level::update_downloads(&pool, level_id).await?;
 
-    let hash1 = generate_hash1(&level.level_string);
-    let hash2 = generate_hash2(level);
+    let hash1 = generate_hash1(&level_data);
+    let hash2 = generate_hash2(&level);
 
-    let response = [Level::to_gd(level, true), hash1, hash2];
+    let response = [level_string, hash1, hash2];
 
     Ok(response.join("#"))
 }
