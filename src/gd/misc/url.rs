@@ -14,5 +14,5 @@ pub struct UrlForm {
 }
 
 pub async fn url(Form(_form): Form<UrlForm>) -> Result<&'static str, AppError> {
-    Ok("http://127.0.0.1")
+    Ok("http://127.0.0.1:2207")
 }

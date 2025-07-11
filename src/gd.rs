@@ -12,6 +12,7 @@ pub mod misc;
 pub mod moderator;
 pub mod post;
 pub mod relationship;
+pub mod score;
 pub mod user;
 
 pub fn routes() -> Router<PgPool> {
@@ -87,4 +88,6 @@ pub fn routes() -> Router<PgPool> {
         .route("/uploadGJLevelList.php", post(list::upload_list))
         .route("/getGJLevelLists.php", post(list::get_lists))
         .route("/deleteGJLevelList.php", post(list::delete_list))
+        // Scores
+        .route("/getGJScores20.php", post(score::get_leaderboard))
 }
