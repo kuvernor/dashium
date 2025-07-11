@@ -3,13 +3,14 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
+#[allow(unused)]
 pub struct AppError(anyhow::Error);
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         (
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong: {}", self.0),
+            format!("Something went wrong"),
         )
             .into_response()
     }

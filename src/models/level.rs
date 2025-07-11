@@ -1,9 +1,12 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
-use sqlx::{PgPool, prelude::FromRow};
+use serde::Serialize;
+use sqlx::{PgPool, Postgres, QueryBuilder, prelude::FromRow};
 
-#[derive(Debug, FromRow)]
+use crate::util::is_numeric;
+
+#[derive(Debug, FromRow, Serialize)]
 #[allow(dead_code)]
 pub struct Level {
     pub id: i32,
@@ -53,6 +56,10 @@ pub struct Level {
     pub epic: i16,
     pub is_gauntlet: i16,
     pub verification_time: i32,
+}
+
+pub struct SearchParams {
+    pub search: String,
 }
 
 impl Level {
@@ -113,19 +120,21 @@ impl Level {
         Ok(level)
     }
 
-    pub async fn get_all(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
-        let level_id = search.parse::<i32>().unwrap_or_default();
+    pub async fn search(pool: &PgPool, params: SearchParams) -> Result<Vec<Self>> {
+        let mut query: QueryBuilder<Postgres> = QueryBuilder::new("SELECT * FROM levels");
 
-        let level = sqlx::query_as!(
-            Self,
-            "SELECT * FROM levels WHERE level_name ILIKE '%' || $1 || '%' OR id = $2",
-            search,
-            level_id
-        )
-        .fetch_all(pool)
-        .await?;
+        if is_numeric(&params.search) {
+            query.push(" WHERE id = ");
+            query.push_bind(params.search);
+        } else {
+            query.push(" WHERE level_name ILIKE '%' || ");
+            query.push_bind(params.search);
+            query.push(" || '%'");
+        }
 
-        Ok(level)
+        let levels = query.build_query_as().fetch_all(pool).await?;
+
+        Ok(levels)
     }
 
     pub async fn update_downloads(pool: &PgPool, level_id: i32) -> Result<()> {

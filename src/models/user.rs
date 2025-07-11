@@ -1,9 +1,10 @@
 use anyhow::Result;
+use serde::Serialize;
 use sqlx::{FromRow, PgPool};
 
 use crate::util::{hash_gjp2, salt_and_sha1};
 
-#[derive(Debug, FromRow)]
+#[derive(Debug, FromRow, Serialize)]
 pub struct User {
     id: i32,
     pub username: String,

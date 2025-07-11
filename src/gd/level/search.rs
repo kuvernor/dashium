@@ -3,7 +3,11 @@ use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::PgPool;
 
-use crate::{AppError, models::Level, util::salt_and_sha1};
+use crate::{
+    AppError,
+    models::{Level, level::SearchParams},
+    util::salt_and_sha1,
+};
 
 #[derive(Serialize, DeserializeFirstDuplicate, Debug)]
 pub struct SearchForm {
@@ -70,9 +74,10 @@ pub async fn search_levels(
     Form(form): Form<SearchForm>,
 ) -> Result<String, AppError> {
     let page = form.page;
-    let search = &form.str;
 
-    let levels: Vec<Level> = Level::get_all(&pool, search).await?;
+    let params = SearchParams { search: form.str };
+
+    let levels: Vec<Level> = Level::search(&pool, params).await?;
 
     if levels.is_empty() {
         return Ok("-1".to_string());
@@ -82,43 +87,46 @@ pub async fn search_levels(
     let count = levels.len();
     let page_info = format!("{count}:{offset}:10");
 
-    let hash = generate_hash(&levels);
+    let song_string = String::new();
 
-    let mut level_response = String::new();
+    let response = [
+        level_string(&levels),
+        creator_string(&levels),
+        song_string,
+        page_info,
+        generate_hash(&levels),
+    ];
 
-    for level in &levels {
+    Ok(response.join("#"))
+}
+
+fn level_string(levels: &Vec<Level>) -> String {
+    let mut level_string = String::new();
+
+    for level in levels {
         let temp = Level::to_gd(level, false);
-        level_response.push_str(&temp);
-        level_response.push('|');
+        level_string.push_str(&temp);
+        level_string.push('|');
     }
 
-    level_response.pop();
+    level_string.pop();
+    level_string
+}
 
-    let mut creator_response = String::new();
+fn creator_string(levels: &Vec<Level>) -> String {
+    let mut creator_string = String::new();
 
-    for level in &levels {
+    for level in levels {
         let creator_id = level.user_id;
         let creator_name = &level.username;
 
         let temp = format!("{creator_id}:{creator_name}:{creator_id}");
-        creator_response.push_str(&temp);
-        creator_response.push('|');
+        creator_string.push_str(&temp);
+        creator_string.push('|');
     }
 
-    creator_response.pop();
-
-    let song_response = String::new();
-
-    let response = [
-        level_response,
-        creator_response,
-        song_response,
-        page_info,
-        hash,
-    ];
-    let response = response.join("#");
-
-    Ok(response)
+    creator_string.pop();
+    creator_string
 }
 
 pub fn generate_hash(levels: &Vec<Level>) -> String {

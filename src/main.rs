@@ -11,6 +11,7 @@ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitEx
 pub mod error;
 pub use crate::error::AppError;
 
+mod api;
 mod gd;
 mod models;
 mod util;
@@ -38,6 +39,7 @@ async fn setup_db() -> Result<PgPool> {
 fn setup_app(pool: PgPool) -> Router {
     Router::new()
         .merge(gd::routes())
+        .nest("/api", api::routes())
         .with_state(pool)
         .layer(TraceLayer::new_for_http())
 }
