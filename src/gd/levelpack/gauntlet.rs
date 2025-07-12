@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::Gauntlet, util::salt_and_sha1};
+use crate::{AppError, GDResponse, models::Gauntlet, util::salt_and_sha1};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -29,8 +29,7 @@ pub async fn get_gauntlets(
     let mut response = String::new();
 
     for gauntlet in &gauntlets {
-        let temp = Gauntlet::to_gd(gauntlet);
-        response.push_str(&temp);
+        response.push_str(&gauntlet.to_gd());
         response.push('|');
     }
 

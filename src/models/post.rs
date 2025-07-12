@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
 use sqlx::{PgPool, prelude::FromRow};
 
-use crate::util::base64_encode;
+use crate::{GDResponse, util::base64_encode};
 
 #[derive(Debug, FromRow)]
 #[allow(unused)]
@@ -17,20 +17,22 @@ pub struct Post {
     pub created_at: DateTime<Utc>,
 }
 
-impl Post {
-    pub fn to_gd(post: Post) -> String {
+impl GDResponse for Post {
+    fn to_gd(&self) -> String {
         let response: Vec<String> = vec![
-            format!("2~{}", base64_encode(&post.body)),
-            format!("3~{}", post.user_id),
-            format!("4~{}", post.likes),
-            format!("6~{}", post.id),
-            format!("7~{}", post.is_spam),
-            format!("8~{}", post.user_id),
-            format!("9~{}", HumanTime::from(post.created_at)).replace(" ago", ""),
+            format!("2~{}", base64_encode(&self.body)),
+            format!("3~{}", self.user_id),
+            format!("4~{}", self.likes),
+            format!("6~{}", self.id),
+            format!("7~{}", self.is_spam),
+            format!("8~{}", self.user_id),
+            format!("9~{}", HumanTime::from(self.created_at)).replace(" ago", ""),
         ];
         response.join("~")
     }
+}
 
+impl Post {
     pub async fn get_all(pool: &PgPool, user_id: i32, username: &str) -> Result<Vec<Self>> {
         let posts = sqlx::query_as!(
             Self,

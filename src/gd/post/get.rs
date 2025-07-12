@@ -3,8 +3,8 @@ use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeLastDuplicate;
 use sqlx::PgPool;
 
-use crate::AppError;
 use crate::models::{Post, User};
+use crate::{AppError, GDResponse};
 
 #[derive(Serialize, DeserializeLastDuplicate, Debug)]
 pub struct GetForm {
@@ -41,8 +41,7 @@ pub async fn get_posts(
     let mut response = String::new();
 
     for post in posts {
-        let temp = Post::to_gd(post);
-        response.push_str(&temp);
+        response.push_str(&post.to_gd());
         response.push('|');
     }
 

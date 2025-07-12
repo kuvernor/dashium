@@ -10,9 +10,9 @@ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitEx
 
 pub mod error;
 pub use crate::error::AppError;
-
 mod api;
-mod gd;
+pub mod gd;
+pub use crate::gd::GDResponse;
 mod models;
 mod util;
 

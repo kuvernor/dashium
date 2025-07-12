@@ -4,7 +4,7 @@ use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::PgPool;
 
 use crate::{
-    AppError,
+    AppError, GDResponse,
     models::{Level, level::SearchParams},
     util::salt_and_sha1,
 };
@@ -104,8 +104,7 @@ fn level_string(levels: &Vec<Level>) -> String {
     let mut level_string = String::new();
 
     for level in levels {
-        let temp = Level::to_gd(level);
-        level_string.push_str(&temp);
+        level_string.push_str(&level.to_gd());
         level_string.push('|');
     }
 

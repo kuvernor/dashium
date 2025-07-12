@@ -2,6 +2,8 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 use sqlx::{PgPool, prelude::FromRow};
 
+use crate::GDResponse;
+
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct List {
@@ -24,29 +26,31 @@ pub struct List {
     pub created_at: DateTime<Utc>,
 }
 
-impl List {
-    pub fn to_gd(list: &Self) -> String {
+impl GDResponse for List {
+    fn to_gd(&self) -> String {
         let response = [
-            format!("1:{}", list.id),
-            format!("2:{}", list.list_name),
-            format!("3:{}", list.description),
-            format!("5:{}", list.version),
-            format!("7:{}", list.difficulty),
-            format!("10:{}", list.downloads),
-            format!("14:{}", list.likes),
-            format!("19:{}", list.is_rated),
-            format!("28:{}", DateTime::timestamp(&list.created_at)),
-            format!("29:{}", DateTime::timestamp(&list.updated_at)),
-            format!("49:{}", list.user_id),
-            format!("50:{}", list.username),
-            format!("51:{}", list.levels),
-            format!("55:{}", list.reward),
-            format!("56:{}", list.requirement),
+            format!("1:{}", self.id),
+            format!("2:{}", self.list_name),
+            format!("3:{}", self.description),
+            format!("5:{}", self.version),
+            format!("7:{}", self.difficulty),
+            format!("10:{}", self.downloads),
+            format!("14:{}", self.likes),
+            format!("19:{}", self.is_rated),
+            format!("28:{}", DateTime::timestamp(&self.created_at)),
+            format!("29:{}", DateTime::timestamp(&self.updated_at)),
+            format!("49:{}", self.user_id),
+            format!("50:{}", self.username),
+            format!("51:{}", self.levels),
+            format!("55:{}", self.reward),
+            format!("56:{}", self.requirement),
         ];
 
         response.join(":")
     }
+}
 
+impl List {
     pub async fn get_all(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
         let list_id = search.parse::<i32>().unwrap_or_default();
 

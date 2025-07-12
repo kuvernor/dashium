@@ -15,6 +15,10 @@ pub mod relationship;
 pub mod score;
 pub mod user;
 
+pub trait GDResponse {
+    fn to_gd(&self) -> String;
+}
+
 pub fn routes() -> Router<PgPool> {
     Router::new()
         .route("/accounts/registerGJAccount.php", post(user::register))

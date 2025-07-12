@@ -4,7 +4,7 @@ use chrono_humanize::HumanTime;
 use serde::Serialize;
 use sqlx::{PgPool, Postgres, QueryBuilder, prelude::FromRow};
 
-use crate::util::is_numeric;
+use crate::{GDResponse, util::is_numeric};
 
 #[derive(Debug, FromRow, Serialize)]
 #[allow(dead_code)]
@@ -57,56 +57,58 @@ pub struct Level {
     pub verification_time: i32,
 }
 
+impl GDResponse for Level {
+    fn to_gd(&self) -> String {
+        let response = vec![
+            format!("1:{}", self.id),
+            format!("2:{}", self.level_name),
+            format!("3:{}", self.description),
+            format!("5:{}", self.version),
+            format!("6:{}", self.user_id),
+            format!("8:{}", self.is_rated),
+            format!("9:{}", self.difficulty),
+            format!("10:{}", self.downloads),
+            format!("12:{}", self.official_song),
+            format!("13:{}", self.game_version),
+            format!("14:{}", self.likes),
+            format!("15:{}", self.length),
+            format!("16:{}", self.dislikes),
+            format!("17:{}", self.is_demon),
+            format!("18:{}", self.stars),
+            format!("19:{}", self.feature_score),
+            format!("25:{}", self.is_auto),
+            format!("27:{}", self.password),
+            format!("28:{}", HumanTime::from(self.created_at)).replace(" ago", ""),
+            format!("29:{}", HumanTime::from(self.updated_at)).replace(" ago", ""),
+            format!("30:{}", self.original),
+            format!("31:{}", self.is_two_player),
+            format!("35:{}", self.song_id),
+            format!("36:{}", self.extra_string),
+            format!("37:{}", self.coins),
+            format!("38:{}", self.verified_coins),
+            format!("39:{}", self.requested_stars),
+            format!("40:{}", self.is_ldm),
+            format!("41:{}", self.daily_number),
+            format!("42:{}", self.epic),
+            format!("43:{}", self.demon_difficulty),
+            format!("44:{}", self.is_gauntlet),
+            format!("45:{}", self.objects),
+            format!("46:{}", self.wt),
+            format!("47:{}", self.wt2),
+            format!("52:{}", self.song_ids),
+            format!("53:{}", self.sfx_ids),
+            format!("57:{}", self.verification_time),
+        ];
+
+        response.join(":")
+    }
+}
+
 pub struct SearchParams {
     pub search: String,
 }
 
 impl Level {
-    pub fn to_gd(level: &Self) -> String {
-        let response = vec![
-            format!("1:{}", level.id),
-            format!("2:{}", level.level_name),
-            format!("3:{}", level.description),
-            format!("5:{}", level.version),
-            format!("6:{}", level.user_id),
-            format!("8:{}", level.is_rated),
-            format!("9:{}", level.difficulty),
-            format!("10:{}", level.downloads),
-            format!("12:{}", level.official_song),
-            format!("13:{}", level.game_version),
-            format!("14:{}", level.likes),
-            format!("15:{}", level.length),
-            format!("16:{}", level.dislikes),
-            format!("17:{}", level.is_demon),
-            format!("18:{}", level.stars),
-            format!("19:{}", level.feature_score),
-            format!("25:{}", level.is_auto),
-            format!("27:{}", level.password),
-            format!("28:{}", HumanTime::from(level.created_at)).replace(" ago", ""),
-            format!("29:{}", HumanTime::from(level.updated_at)).replace(" ago", ""),
-            format!("30:{}", level.original),
-            format!("31:{}", level.is_two_player),
-            format!("35:{}", level.song_id),
-            format!("36:{}", level.extra_string),
-            format!("37:{}", level.coins),
-            format!("38:{}", level.verified_coins),
-            format!("39:{}", level.requested_stars),
-            format!("40:{}", level.is_ldm),
-            format!("41:{}", level.daily_number),
-            format!("42:{}", level.epic),
-            format!("43:{}", level.demon_difficulty),
-            format!("44:{}", level.is_gauntlet),
-            format!("45:{}", level.objects),
-            format!("46:{}", level.wt),
-            format!("47:{}", level.wt2),
-            format!("52:{}", level.song_ids),
-            format!("53:{}", level.sfx_ids),
-            format!("57:{}", level.verification_time),
-        ];
-
-        response.join(":")
-    }
-
     pub async fn get(pool: &PgPool, level_id: i32) -> Result<Self> {
         let level = sqlx::query_as!(Self, "SELECT * FROM levels WHERE id = $1", level_id)
             .fetch_one(pool)

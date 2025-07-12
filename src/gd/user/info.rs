@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::AppError;
+use crate::GDResponse;
 use crate::models::{Block, User};
 use crate::util::verify_gjp2;
 
@@ -31,7 +32,7 @@ pub async fn info(
     }
 
     let user = User::get_user(&pool, target_id).await?;
-    let response = User::to_gd(user);
+    let response = user.to_gd();
 
     Ok(response)
 }

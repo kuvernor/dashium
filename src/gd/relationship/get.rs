@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::FriendRequest, util::verify_gjp2};
+use crate::{AppError, GDResponse, models::FriendRequest, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -48,8 +48,7 @@ pub async fn get_friend_requests(
     let mut response = String::new();
 
     for friend_request in friend_requests {
-        let temp = FriendRequest::to_gd(&pool, friend_request).await?;
-        response.push_str(&temp);
+        response.push_str(&friend_request.to_gd());
         response.push('|');
     }
 

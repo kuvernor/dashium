@@ -2,9 +2,9 @@ use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
 use serde::Serialize;
-use sqlx::{PgPool, prelude::FromRow};
+use sqlx::{PgPool, Postgres, QueryBuilder, prelude::FromRow};
 
-use crate::{models::User, util::base64_encode};
+use crate::{GDResponse, util::base64_encode};
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct Comment {
@@ -18,92 +18,118 @@ pub struct Comment {
     pub created_at: DateTime<Utc>,
     pub percent: i16,
     pub chat_color: String,
+    pub mod_level: i16,
+    pub icon: i16,
+    pub color1: i16,
+    pub color2: i16,
+    pub icon_type: i16,
+    pub glow: i16,
 }
 
-impl Comment {
-    pub async fn to_gd(pool: &PgPool, comment: &Self, include_level_id: bool) -> Result<String> {
-        let user = User::get_user(pool, comment.user_id).await?;
-        let mut comment_string = vec![
-            format!("2~{}", base64_encode(&comment.comment)),
-            format!("3~{}", comment.user_id),
-            format!("4~{}", comment.likes),
-            format!("6~{}", comment.id),
-            format!("7~{}", comment.is_spam),
-            format!("8~{}", comment.user_id),
-            format!("9~{}", HumanTime::from(comment.created_at)).replace(" ago", ""),
-            format!("10~{}", comment.percent),
-            format!("11~{}", user.mod_level),
-            format!("12~{}", comment.chat_color),
+impl GDResponse for Comment {
+    fn to_gd(&self) -> String {
+        let comment_string = vec![
+            format!("2~{}", base64_encode(&self.comment)),
+            format!("3~{}", self.user_id),
+            format!("4~{}", self.likes),
+            format!("6~{}", self.id),
+            format!("7~{}", self.is_spam),
+            format!("8~{}", self.user_id),
+            format!("9~{}", HumanTime::from(self.created_at)).replace(" ago", ""),
+            format!("10~{}", self.percent),
+            format!("11~{}", self.mod_level),
+            format!("12~{}", self.chat_color),
         ];
-
-        if include_level_id {
-            comment_string.insert(0, format!("1~{}", comment.level_id));
-        }
 
         let comment_string = comment_string.join("~");
 
         let user_string = [
-            format!("1~{}", comment.username),
-            format!("9~{}", user.icon),
-            format!("10~{}", user.color1),
-            format!("11~{}", user.color2),
-            format!("14~{}", user.icon_type),
-            format!("15~{}", user.glow),
-            format!("16~{}", comment.user_id),
+            format!("1~{}", self.username),
+            format!("9~{}", self.icon),
+            format!("10~{}", self.color1),
+            format!("11~{}", self.color2),
+            format!("14~{}", self.icon_type),
+            format!("15~{}", self.glow),
+            format!("16~{}", self.user_id),
         ];
 
         let user_string = user_string.join("~");
-        let response = format!("{comment_string}:{user_string}");
 
-        Ok(response)
+        format!("{comment_string}:{user_string}")
     }
+}
 
+impl Comment {
     pub async fn get_all(pool: &PgPool, level_id: i32, mode: u8) -> Result<Vec<Self>> {
-        let comments = match mode {
-            1 => {
-                sqlx::query_as!(
-                    Self,
-                    "SELECT * FROM comments WHERE level_id = $1 ORDER BY likes DESC",
-                    level_id
-                )
-                .fetch_all(pool)
-                .await?
-            }
-            _ => {
-                sqlx::query_as!(
-                    Self,
-                    "SELECT * FROM comments WHERE level_id = $1 ORDER BY created_at DESC",
-                    level_id
-                )
-                .fetch_all(pool)
-                .await?
-            }
+        let mut query: QueryBuilder<Postgres> = QueryBuilder::new(
+            r#"
+            SELECT
+                c.id,
+                c.level_id,
+                c.user_id,
+                c.username,
+                c.comment,
+                c.likes,
+                c.is_spam,
+                c.created_at,
+                c.percent,
+                c.chat_color,
+                u.mod_level,
+                u.icon,
+                u.color1,
+                u.color2,
+                u.icon_type,
+                u.glow
+            FROM comments c
+            JOIN users u ON u.id = c.user_id
+            WHERE c.level_id = 
+            "#,
+        );
+        query.push_bind(level_id);
+
+        match mode {
+            1 => query.push(" ORDER BY c.likes DESC"),
+            _ => query.push(" ORDER BY c.created_at DESC"),
         };
+
+        let comments = query.build_query_as().fetch_all(pool).await?;
 
         Ok(comments)
     }
 
     pub async fn get_from_user(pool: &PgPool, user_id: i32, mode: u8) -> Result<Vec<Self>> {
-        let comments = match mode {
-            1 => {
-                sqlx::query_as!(
-                    Self,
-                    "SELECT * FROM comments WHERE user_id = $1 ORDER BY likes DESC",
-                    user_id
-                )
-                .fetch_all(pool)
-                .await?
-            }
-            _ => {
-                sqlx::query_as!(
-                    Self,
-                    "SELECT * FROM comments WHERE user_id = $1 ORDER BY created_at DESC",
-                    user_id
-                )
-                .fetch_all(pool)
-                .await?
-            }
+        let mut query: QueryBuilder<Postgres> = QueryBuilder::new(
+            r#"
+            SELECT
+                c.id,
+                c.level_id,
+                c.user_id,
+                c.username,
+                c.comment,
+                c.likes,
+                c.is_spam,
+                c.created_at,
+                c.percent,
+                c.chat_color,
+                u.mod_level,
+                u.icon,
+                u.color1,
+                u.color2,
+                u.icon_type,
+                u.glow
+            FROM comments c
+            JOIN users u ON u.id = c.user_id
+            WHERE c.user_id = 
+            "#,
+        );
+        query.push_bind(user_id);
+
+        match mode {
+            1 => query.push(" ORDER BY c.likes DESC"),
+            _ => query.push(" ORDER BY c.created_at DESC"),
         };
+
+        let comments = query.build_query_as().fetch_all(pool).await?;
 
         Ok(comments)
     }

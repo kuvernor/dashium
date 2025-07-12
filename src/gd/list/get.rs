@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::List};
+use crate::{AppError, GDResponse, models::List};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -39,7 +39,7 @@ pub async fn get_lists(
     let mut list_string = String::new();
 
     for list in &lists {
-        let temp = List::to_gd(list);
+        let temp = list.to_gd();
         list_string.push_str(&temp);
         list_string.push('|');
     }

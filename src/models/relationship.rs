@@ -1,11 +1,11 @@
-use crate::models::User;
+use crate::GDResponse;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
+use serde::Serialize;
 use sqlx::{FromRow, PgPool};
 
-#[derive(Debug, FromRow)]
-#[allow(unused)]
+#[derive(Debug, FromRow, Serialize)]
 pub struct FriendRequest {
     pub id: i32,
     pub sender_id: i32,
@@ -13,33 +13,58 @@ pub struct FriendRequest {
     pub body: String,
     pub created_at: DateTime<Utc>,
     pub is_new: i16,
+    pub username: String,
+    pub icon: i16,
+    pub color1: i16,
+    pub color2: i16,
+    pub icon_type: i16,
+    pub glow: i16,
+}
+
+impl GDResponse for FriendRequest {
+    fn to_gd(&self) -> String {
+        let response = vec![
+            format!("1:{}", self.username),
+            format!("2:{}", self.sender_id),
+            format!("9:{}", self.icon),
+            format!("10:{}", self.color1),
+            format!("11:{}", self.color2),
+            format!("14:{}", self.icon_type),
+            format!("15:{}", self.glow),
+            format!("16:{}", self.sender_id),
+            format!("32:{}", self.id),
+            format!("35:{}", self.body),
+            format!("37:{}", HumanTime::from(self.created_at)).replace(" ago", ""),
+            format!("41:{}", self.is_new),
+        ];
+
+        response.join(":")
+    }
 }
 
 impl FriendRequest {
-    pub async fn to_gd(pool: &PgPool, friend_request: Self) -> Result<String> {
-        let user = User::get_user(pool, friend_request.sender_id).await?;
-
-        let response = vec![
-            format!("1:{}", user.username),
-            format!("2:{}", friend_request.sender_id),
-            format!("9:{}", user.icon),
-            format!("10:{}", user.color1),
-            format!("11:{}", user.color2),
-            format!("14:{}", user.icon_type),
-            format!("15:{}", user.glow),
-            format!("16:{}", friend_request.sender_id),
-            format!("32:{}", friend_request.id),
-            format!("35:{}", friend_request.body),
-            format!("37:{}", HumanTime::from(friend_request.created_at)).replace(" ago", ""),
-            format!("41:{}", friend_request.is_new),
-        ];
-        Ok(response.join(":"))
-    }
-
     pub async fn get_all(pool: &PgPool, sender_id: i32) -> Result<Vec<Self>> {
         let friend_requests = sqlx::query_as!(
             Self,
-            "SELECT * from friend_requests WHERE recipient_id = $1 ORDER BY created_at DESC",
+            r#"
+            SELECT
+                fr.id,
+                fr.sender_id,
+                fr.recipient_id,
+                fr.body,
+                fr.created_at,
+                fr.is_new,
+                u.username,
+                u.icon,
+                u.color1,
+                u.color2,
+                u.icon_type,
+                u.glow
+            FROM friend_requests fr
+            JOIN users u ON u.id = fr.sender_id
+            WHERE fr.recipient_id = $1
+            ORDER BY fr.created_at DESC
+            "#,
             sender_id
         )
         .fetch_all(pool)
@@ -51,8 +76,26 @@ impl FriendRequest {
     pub async fn get_all_sent(pool: &PgPool, sender_id: i32) -> Result<Vec<Self>> {
         let friend_requests = sqlx::query_as!(
             Self,
-            "SELECT * FROM friend_requests WHERE sender_id = $1 ORDER BY created_at DESC",
-            sender_id,
+            r#"
+            SELECT
+                fr.id,
+                fr.sender_id,
+                fr.recipient_id,
+                fr.body,
+                fr.created_at,
+                fr.is_new,
+                u.username,
+                u.icon,
+                u.color1,
+                u.color2,
+                u.icon_type,
+                u.glow
+            FROM friend_requests fr
+            JOIN users u ON u.id = fr.sender_id
+            WHERE fr.sender_id = $1
+            ORDER BY fr.created_at DESC
+            "#,
+            sender_id
         )
         .fetch_all(pool)
         .await?;

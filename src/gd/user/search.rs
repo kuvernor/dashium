@@ -1,5 +1,5 @@
-use crate::AppError;
 use crate::models::User;
+use crate::{AppError, GDResponse};
 use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -38,8 +38,7 @@ pub async fn search(
     let mut response = String::new();
 
     for user in users {
-        let temp = User::to_gd(user);
-        response.push_str(&temp);
+        response.push_str(&user.to_gd());
 
         response.push('|');
     }

@@ -2,9 +2,9 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::AppError;
 use crate::models::Message;
 use crate::util::verify_gjp2;
+use crate::{AppError, GDResponse};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetForm {
@@ -51,8 +51,7 @@ pub async fn get_messages(
     let mut response = String::new();
 
     for message in messages {
-        let temp = Message::to_gd(message);
-        response.push_str(&temp);
+        response.push_str(&message.to_gd());
         response.push('|');
     }
 

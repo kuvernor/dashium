@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::MapPack, util::salt_and_sha1};
+use crate::{AppError, GDResponse, models::MapPack, util::salt_and_sha1};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -35,8 +35,7 @@ pub async fn get_map_packs(
     let mut response = String::new();
 
     for map_pack in &map_packs {
-        let temp = MapPack::to_gd(map_pack);
-        response.push_str(&temp);
+        response.push_str(&map_pack.to_gd());
         response.push('|');
     }
 

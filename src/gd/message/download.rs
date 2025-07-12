@@ -3,7 +3,7 @@ use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::PgPool;
 
-use crate::{AppError, models::Message, util::verify_gjp2};
+use crate::{AppError, GDResponse, models::Message, util::verify_gjp2};
 
 #[derive(Serialize, DeserializeFirstDuplicate, Debug)]
 pub struct DownloadForm {
@@ -30,7 +30,7 @@ pub async fn download_message(
     }
 
     let message = Message::download(&pool, message_id, user_id).await?;
-    let response = Message::to_gd(message);
+    let response = message.to_gd();
 
     Ok(response)
 }

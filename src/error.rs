@@ -19,7 +19,7 @@ impl IntoResponse for AppError {
 
         #[cfg(not(debug_assertions))]
         {
-            (StatusCode::INTERNAL_SERVER_ERROR, format!("-1")).into_response()
+            (StatusCode::INTERNAL_SERVER_ERROR, "-1".to_string()).into_response()
         }
     }
 }

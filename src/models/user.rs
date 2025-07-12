@@ -2,7 +2,10 @@ use anyhow::Result;
 use serde::Serialize;
 use sqlx::{FromRow, PgPool};
 
-use crate::util::{hash_gjp2, salt_and_sha1};
+use crate::{
+    GDResponse,
+    util::{hash_gjp2, salt_and_sha1},
+};
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct User {
@@ -45,52 +48,55 @@ pub struct User {
     pub platformer_info: String,
 }
 
-impl User {
-    pub fn to_gd(user: User) -> String {
-        let response: Vec<String> = vec![
-            format!("1:{}", user.username),
-            format!("2:{}", user.id),
-            format!("3:{}", user.stars),
-            format!("4:{}", user.demons),
-            format!("8:{}", user.creator_points),
-            format!("9:{}", user.display_icon),
-            format!("10:{}", user.color1),
-            format!("11:{}", user.color2),
-            format!("13:{}", user.coins),
-            format!("14:{}", user.icon_type),
-            format!("15:{}", user.glow),
-            format!("16:{}", user.id),
-            format!("17:{}", user.user_coins),
-            format!("18:{}", user.message_setting),
-            format!("19:{}", user.friend_setting),
-            format!("20:{}", user.youtube),
-            format!("21:{}", user.icon),
-            format!("22:{}", user.ship),
-            format!("23:{}", user.ball),
-            format!("24:{}", user.ufo),
-            format!("25:{}", user.wave),
-            format!("26:{}", user.robot),
-            format!("28:{}", user.glow),
-            format!("29:{}", user.is_activated),
-            format!("30:{}", user.rank),
-            format!("43:{}", user.spider),
-            format!("44:{}", user.twitter),
-            format!("45:{}", user.twitch),
-            format!("46:{}", user.diamonds),
-            format!("48:{}", user.explosion),
-            format!("49:{}", user.mod_level),
-            format!("50:{}", user.comment_setting),
-            format!("51:{}", user.color3),
-            format!("52:{}", user.moons),
-            format!("53:{}", user.swing),
-            format!("54:{}", user.jetpack),
-            format!("55:{}", user.demon_info),
-            format!("56:{}", user.level_info),
-            format!("57:{}", user.platformer_info),
+impl GDResponse for User {
+    fn to_gd(&self) -> String {
+        let response = [
+            format!("1:{}", self.username),
+            format!("2:{}", self.id),
+            format!("3:{}", self.stars),
+            format!("4:{}", self.demons),
+            format!("8:{}", self.creator_points),
+            format!("9:{}", self.display_icon),
+            format!("10:{}", self.color1),
+            format!("11:{}", self.color2),
+            format!("13:{}", self.coins),
+            format!("14:{}", self.icon_type),
+            format!("15:{}", self.glow),
+            format!("16:{}", self.id),
+            format!("17:{}", self.coins),
+            format!("18:{}", self.message_setting),
+            format!("19:{}", self.friend_setting),
+            format!("20:{}", self.youtube),
+            format!("21:{}", self.icon),
+            format!("22:{}", self.ship),
+            format!("23:{}", self.ball),
+            format!("24:{}", self.ufo),
+            format!("25:{}", self.wave),
+            format!("26:{}", self.robot),
+            format!("28:{}", self.glow),
+            format!("29:{}", self.is_activated),
+            format!("30:{}", self.rank),
+            format!("43:{}", self.spider),
+            format!("44:{}", self.twitter),
+            format!("45:{}", self.twitch),
+            format!("46:{}", self.diamonds),
+            format!("48:{}", self.explosion),
+            format!("49:{}", self.mod_level),
+            format!("50:{}", self.comment_setting),
+            format!("51:{}", self.color3),
+            format!("52:{}", self.moons),
+            format!("53:{}", self.swing),
+            format!("54:{}", self.jetpack),
+            format!("55:{}", self.demon_info),
+            format!("56:{}", self.level_info),
+            format!("57:{}", self.platformer_info),
         ];
+
         response.join(":")
     }
+}
 
+impl User {
     pub async fn get_user(pool: &PgPool, user_id: i32) -> Result<Self> {
         let user = sqlx::query_as!(
             Self,

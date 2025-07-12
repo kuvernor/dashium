@@ -1,3 +1,4 @@
+use crate::GDResponse;
 use crate::{AppError, models::Level, util::salt_and_sha1};
 use axum::{Form, extract::State};
 use serde::Serialize;
@@ -40,7 +41,7 @@ pub async fn download_level(
     file.read_to_end(&mut level_data).await?;
     let level_data = String::from_utf8(level_data)?;
 
-    let level_string = format!("4:{}:{}", level_data, Level::to_gd(level));
+    let level_string = format!("4:{}:{}", level_data, level.to_gd());
 
     Level::update_downloads(&pool, level_id).await?;
 

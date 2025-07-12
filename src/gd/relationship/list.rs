@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::{
-    AppError,
+    AppError, GDResponse,
     models::{Block, Friendship, User},
     util::verify_gjp2,
 };
@@ -45,7 +45,7 @@ pub async fn get_user_list(
 
         for block in blocks {
             let target = User::get_user(&pool, block.blocked_id).await?;
-            let temp = User::to_gd(target);
+            let temp = target.to_gd();
 
             response.push_str(&temp);
             response.push('|');
@@ -66,7 +66,7 @@ pub async fn get_user_list(
 
     for friend in friends {
         let user2 = User::get_user(&pool, friend.user2).await?;
-        let temp = User::to_gd(user2);
+        let temp = user2.to_gd();
 
         response.push_str(&temp);
         response.push_str(":41:1");

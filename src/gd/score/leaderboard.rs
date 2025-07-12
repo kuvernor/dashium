@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Postgres, QueryBuilder};
 
-use crate::{AppError, models::User};
+use crate::{AppError, GDResponse, models::User};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -70,13 +70,12 @@ pub async fn get_leaderboard(
         _ => return Ok("".to_string()),
     }
 
-    let users = query.build_query_as().fetch_all(&pool).await?;
+    let users: Vec<User> = query.build_query_as().fetch_all(&pool).await?;
 
     let mut response = String::new();
 
     for user in users {
-        let temp = User::to_gd(user);
-        response.push_str(&temp);
+        response.push_str(&user.to_gd());
         response.push('|');
     }
 

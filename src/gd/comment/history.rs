@@ -2,7 +2,7 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::Comment};
+use crate::{AppError, GDResponse, models::Comment};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
@@ -39,8 +39,7 @@ pub async fn get_history(
     let mut response = String::new();
 
     for comment in &comments {
-        let temp = Comment::to_gd(&pool, comment, true).await?;
-        response.push_str(&temp);
+        response.push_str(&comment.to_gd());
         response.push('|');
     }
 

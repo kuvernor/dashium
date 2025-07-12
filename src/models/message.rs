@@ -1,12 +1,12 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
+use serde::Serialize;
 use sqlx::{PgPool, prelude::FromRow};
 
-use crate::models::User;
+use crate::{GDResponse, models::User};
 
-#[derive(Debug, FromRow)]
-#[allow(dead_code)]
+#[derive(Debug, FromRow, Serialize)]
 pub struct Message {
     pub id: i32,
     pub sender_id: i32,
@@ -19,23 +19,25 @@ pub struct Message {
     pub created_at: DateTime<Utc>,
 }
 
-impl Message {
-    pub fn to_gd(message: Self) -> String {
+impl GDResponse for Message {
+    fn to_gd(&self) -> String {
         let response: Vec<String> = vec![
-            format!("1:{}", message.id),
-            format!("2:{}", message.sender_id),
-            format!("3:{}", message.sender_id),
-            format!("4:{}", message.subject),
-            format!("5:{}", message.body),
-            format!("6:{}", message.username),
-            format!("7:{}", HumanTime::from(message.created_at)).replace(" ago", ""),
-            format!("8:{}", message.is_read),
-            format!("9:{}", message.is_sender),
+            format!("1:{}", self.id),
+            format!("2:{}", self.sender_id),
+            format!("3:{}", self.sender_id),
+            format!("4:{}", self.subject),
+            format!("5:{}", self.body),
+            format!("6:{}", self.username),
+            format!("7:{}", HumanTime::from(self.created_at)).replace(" ago", ""),
+            format!("8:{}", self.is_read),
+            format!("9:{}", self.is_sender),
         ];
 
         response.join(":")
     }
+}
 
+impl Message {
     pub async fn send(
         pool: &PgPool,
         sender_id: i32,

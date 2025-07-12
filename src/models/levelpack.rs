@@ -1,9 +1,11 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 use sqlx::{PgPool, prelude::FromRow};
 
-#[derive(Debug, FromRow)]
-#[allow(dead_code)]
+use crate::GDResponse;
+
+#[derive(Debug, FromRow, Serialize)]
 pub struct MapPack {
     pub id: i32,
     pub pack_name: String,
@@ -16,22 +18,24 @@ pub struct MapPack {
     pub created_at: DateTime<Utc>,
 }
 
-impl MapPack {
-    pub fn to_gd(map_pack: &Self) -> String {
+impl GDResponse for MapPack {
+    fn to_gd(&self) -> String {
         let response = [
-            format!("1:{}", map_pack.id),
-            format!("2:{}", map_pack.pack_name),
-            format!("3:{}", map_pack.levels),
-            format!("4:{}", map_pack.stars),
-            format!("5:{}", map_pack.coins),
-            format!("6:{}", map_pack.difficulty),
-            format!("7:{}", map_pack.text_color),
-            format!("8:{}", map_pack.bar_color),
+            format!("1:{}", self.id),
+            format!("2:{}", self.pack_name),
+            format!("3:{}", self.levels),
+            format!("4:{}", self.stars),
+            format!("5:{}", self.coins),
+            format!("6:{}", self.difficulty),
+            format!("7:{}", self.text_color),
+            format!("8:{}", self.bar_color),
         ];
 
         response.join(":")
     }
+}
 
+impl MapPack {
     pub async fn get(pool: &PgPool) -> Result<Vec<Self>> {
         let map_packs = sqlx::query_as!(Self, "SELECT * FROM map_packs")
             .fetch_all(pool)
@@ -41,19 +45,20 @@ impl MapPack {
     }
 }
 
-#[derive(Debug, FromRow)]
-#[allow(dead_code)]
+#[derive(Debug, FromRow, Serialize)]
 pub struct Gauntlet {
     pub id: i32,
     pub levels: String,
     pub created_at: DateTime<Utc>,
 }
 
-impl Gauntlet {
-    pub fn to_gd(gauntlet: &Self) -> String {
-        format!("1:{}:3:{}", gauntlet.id, gauntlet.levels)
+impl GDResponse for Gauntlet {
+    fn to_gd(&self) -> String {
+        format!("1:{}:3:{}", self.id, self.levels)
     }
+}
 
+impl Gauntlet {
     pub async fn get(pool: &PgPool) -> Result<Vec<Self>> {
         let gauntlets = sqlx::query_as!(Self, "SELECT * FROM gauntlets")
             .fetch_all(pool)
