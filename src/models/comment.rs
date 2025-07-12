@@ -114,13 +114,15 @@ impl Comment {
         username: &str,
         level_id: i32,
         comment: &str,
+        percent: i16,
     ) -> Result<i32> {
         let comment_id = sqlx::query_scalar!(
-            "INSERT INTO comments (user_id, username, level_id, comment) VALUES ($1, $2, $3, $4) RETURNING id",
+            "INSERT INTO comments (user_id, username, level_id, comment, percent) VALUES ($1, $2, $3, $4, $5) RETURNING id",
             user_id,
             username,
             level_id,
-            comment
+            comment,
+            percent
         )
         .fetch_one(pool)
         .await?;

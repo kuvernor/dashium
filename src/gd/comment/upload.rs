@@ -34,12 +34,13 @@ pub async fn upload_comment(
     let level_id = form.levelID;
     let username = &form.userName;
     let comment = &base64_decode(&form.comment)?;
+    let percent = form.percent;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());
     }
 
-    match Comment::upload(&pool, user_id, username, level_id, comment).await {
+    match Comment::upload(&pool, user_id, username, level_id, comment, percent).await {
         Ok(response) => Ok(response.to_string()),
         Err(_) => Ok("-1".to_string()),
     }
