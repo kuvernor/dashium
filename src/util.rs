@@ -3,6 +3,7 @@ use argon2::{
     Argon2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
+use base64::{Engine as _, engine::general_purpose::URL_SAFE};
 use sha1::{Digest, Sha1};
 use sqlx::PgPool;
 
@@ -49,4 +50,12 @@ pub async fn verify_gjp2(pool: &PgPool, user_id: i32, gjp2: &str) -> Result<bool
     let hash = PasswordHash::new(&hash).expect("Failed to parse hash");
 
     Ok(argon2.verify_password(gjp2.as_bytes(), &hash).is_ok())
+}
+
+pub fn base64_encode(input: &str) -> String {
+    URL_SAFE.encode(input)
+}
+
+pub fn base64_decode(input: &str) -> Result<String> {
+    Ok(String::from_utf8(URL_SAFE.decode(input)?)?)
 }

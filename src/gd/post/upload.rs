@@ -5,7 +5,7 @@ use sqlx::PgPool;
 
 use crate::AppError;
 use crate::models::Post;
-use crate::util::verify_gjp2;
+use crate::util::{base64_decode, verify_gjp2};
 
 #[derive(Serialize, DeserializeFirstDuplicate, Debug)]
 pub struct UploadForm {
@@ -28,7 +28,7 @@ pub async fn upload_post(
 ) -> Result<String, AppError> {
     let user_id = form.accountID;
     let gjp2 = &form.gjp2;
-    let body = &form.comment;
+    let body = &base64_decode(&form.comment)?;
     let username = &form.userName;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {

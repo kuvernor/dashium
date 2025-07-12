@@ -3,22 +3,24 @@ use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
 use sqlx::{PgPool, prelude::FromRow};
 
+use crate::util::base64_encode;
+
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Post {
-    id: i32,
-    user_id: i32,
-    username: String,
-    body: String,
-    likes: i32,
-    is_spam: i16,
-    created_at: DateTime<Utc>,
+    pub id: i32,
+    pub user_id: i32,
+    pub username: String,
+    pub body: String,
+    pub likes: i32,
+    pub is_spam: i16,
+    pub created_at: DateTime<Utc>,
 }
 
 impl Post {
     pub fn to_gd(post: Post) -> String {
         let response: Vec<String> = vec![
-            format!("2~{}", post.body),
+            format!("2~{}", base64_encode(&post.body)),
             format!("3~{}", post.user_id),
             format!("4~{}", post.likes),
             format!("6~{}", post.id),

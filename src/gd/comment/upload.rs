@@ -2,7 +2,11 @@ use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::{AppError, models::Comment, util::verify_gjp2};
+use crate::{
+    AppError,
+    models::Comment,
+    util::{base64_decode, verify_gjp2},
+};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct UploadForm {
@@ -29,7 +33,7 @@ pub async fn upload_comment(
     let gjp2 = &form.gjp2;
     let level_id = form.levelID;
     let username = &form.userName;
-    let comment = &form.comment;
+    let comment = &base64_decode(&form.comment)?;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
         return Ok("-1".to_string());

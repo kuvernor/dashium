@@ -8,15 +8,15 @@ use crate::models::User;
 #[derive(Debug, FromRow)]
 #[allow(dead_code)]
 pub struct Message {
-    id: i32,
-    sender_id: i32,
-    subject: String,
-    body: String,
-    username: String,
-    is_read: i16,
-    is_sender: i16,
-    recipient_id: i32,
-    created_at: DateTime<Utc>,
+    pub id: i32,
+    pub sender_id: i32,
+    pub subject: String,
+    pub body: String,
+    pub username: String,
+    pub is_read: i16,
+    pub is_sender: i16,
+    pub recipient_id: i32,
+    pub created_at: DateTime<Utc>,
 }
 
 impl Message {

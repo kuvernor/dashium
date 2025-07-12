@@ -8,11 +8,19 @@ pub struct AppError(anyhow::Error);
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong"),
-        )
-            .into_response()
+        #[cfg(debug_assertions)]
+        {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Something went wrong: {}", self.0),
+            )
+                .into_response()
+        }
+
+        #[cfg(not(debug_assertions))]
+        {
+            (StatusCode::INTERNAL_SERVER_ERROR, format!("-1")).into_response()
+        }
     }
 }
 

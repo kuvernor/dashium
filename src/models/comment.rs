@@ -1,29 +1,30 @@
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use chrono_humanize::HumanTime;
+use serde::Serialize;
 use sqlx::{PgPool, prelude::FromRow};
 
-use crate::models::User;
+use crate::{models::User, util::base64_encode};
 
-#[derive(Debug, FromRow)]
+#[derive(Debug, FromRow, Serialize)]
 pub struct Comment {
-    id: i32,
-    level_id: i32,
-    user_id: i32,
-    username: String,
-    comment: String,
-    likes: i32,
-    is_spam: i16,
-    created_at: DateTime<Utc>,
-    percent: i16,
-    chat_color: String,
+    pub id: i32,
+    pub level_id: i32,
+    pub user_id: i32,
+    pub username: String,
+    pub comment: String,
+    pub likes: i32,
+    pub is_spam: i16,
+    pub created_at: DateTime<Utc>,
+    pub percent: i16,
+    pub chat_color: String,
 }
 
 impl Comment {
     pub async fn to_gd(pool: &PgPool, comment: &Self, include_level_id: bool) -> Result<String> {
         let user = User::get_user(pool, comment.user_id).await?;
         let mut comment_string = vec![
-            format!("2~{}", comment.comment),
+            format!("2~{}", base64_encode(&comment.comment)),
             format!("3~{}", comment.user_id),
             format!("4~{}", comment.likes),
             format!("6~{}", comment.id),

@@ -158,7 +158,7 @@ pub async fn upload_level(
     .fetch_one(&pool)
     .await?;
 
-    let path = format!("./data/levels/{}.level", level_id);
+    let path = format!("./data/levels/{level_id}.level");
     let path = Path::new(&path);
     let mut file = File::create(path).await?;
     file.write_all(level_string.as_bytes()).await?;

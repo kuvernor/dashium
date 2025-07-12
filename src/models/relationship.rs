@@ -7,12 +7,12 @@ use sqlx::{FromRow, PgPool};
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct FriendRequest {
-    id: i32,
-    sender_id: i32,
-    recipient_id: i32,
-    body: String,
-    created_at: DateTime<Utc>,
-    is_new: i16,
+    pub id: i32,
+    pub sender_id: i32,
+    pub recipient_id: i32,
+    pub body: String,
+    pub created_at: DateTime<Utc>,
+    pub is_new: i16,
 }
 
 impl FriendRequest {
@@ -114,12 +114,12 @@ impl FriendRequest {
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Friendship {
-    id: i32,
-    user1: i32,
+    pub id: i32,
+    pub user1: i32,
     pub user2: i32,
-    is_new1: i16,
-    is_new2: i16,
-    created_at: DateTime<Utc>,
+    pub is_new1: i16,
+    pub is_new2: i16,
+    pub created_at: DateTime<Utc>,
 }
 
 impl Friendship {
@@ -173,10 +173,10 @@ impl Friendship {
 #[derive(Debug, FromRow)]
 #[allow(unused)]
 pub struct Block {
-    id: i32,
-    blocker_id: i32,
+    pub id: i32,
+    pub blocker_id: i32,
     pub blocked_id: i32,
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
 }
 
 impl Block {
