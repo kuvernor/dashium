@@ -50,11 +50,11 @@ pub async fn upload_level(
     let user_id = form.accountID;
     let gjp2 = &form.gjp2;
     let official_song = form.audioTrack;
-    let is_auto = form.auto;
+    let auto = form.auto;
     let binary_version = form.binaryVersion;
     let coins = form.coins;
     let game_version = form.gameVersion;
-    let is_ldm = form.ldm;
+    let ldm = form.ldm;
     let description = &form.levelDesc;
     let level_info = &form.levelInfo;
     let length = form.levelLength;
@@ -66,7 +66,7 @@ pub async fn upload_level(
     let password = &form.password;
     let requested_stars = form.requestedStars;
     let song_id = form.songID;
-    let is_two_player = form.twoPlayer;
+    let two_player = form.twoPlayer;
     let unlisted = form.unlisted;
     let username = &form.userName;
     let wt = form.wt;
@@ -82,11 +82,11 @@ pub async fn upload_level(
         INSERT INTO levels (
             user_id,
             official_song,
-            is_auto,
+            auto,
             binary_version,
             coins,
             game_version,
-            is_ldm,
+            ldm,
             description,
             level_info,
             length,
@@ -97,7 +97,7 @@ pub async fn upload_level(
             password,
             requested_stars,
             song_id,
-            is_two_player,
+            two_player,
             unlisted,
             username,
             wt,
@@ -133,11 +133,11 @@ pub async fn upload_level(
         "#,
         user_id,
         official_song,
-        is_auto,
+        auto,
         binary_version,
         coins,
         game_version,
-        is_ldm,
+        ldm,
         description,
         level_info,
         length,
@@ -148,7 +148,7 @@ pub async fn upload_level(
         password,
         requested_stars,
         song_id,
-        is_two_player,
+        two_player,
         unlisted,
         username,
         wt,

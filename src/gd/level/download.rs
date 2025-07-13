@@ -79,7 +79,7 @@ pub fn generate_hash1(level_string: &str) -> String {
 pub fn generate_hash2(level: &Level) -> String {
     let user_id = level.user_id;
     let stars = level.stars;
-    let is_demon = level.is_demon;
+    let demon = level.demon;
     let level_id = level.id;
     let verified_coins = level.verified_coins;
     let feature_score = level.feature_score;
@@ -87,7 +87,7 @@ pub fn generate_hash2(level: &Level) -> String {
     let daily_number = level.daily_number;
 
     let hash = format!(
-        "{user_id},{stars},{is_demon},{level_id},{verified_coins},{feature_score},{password},{daily_number}"
+        "{user_id},{stars},{demon},{level_id},{verified_coins},{feature_score},{password},{daily_number}"
     );
 
     salt_and_sha1(&hash, "xI25fpAapCQg")

@@ -1,11 +1,13 @@
 use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Postgres, QueryBuilder};
+use sqlx::PgPool;
 
-use crate::{AppError, GDResponse, models::User};
+use crate::{AppError, GDResponse, models::User, util::verify_gjp2};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
+    accountID: i32,
+    gjp2: String,
     #[serde(rename = "type")]
     leaderboard_type: String,
 }
@@ -14,63 +16,42 @@ pub async fn get_leaderboard(
     State(pool): State<PgPool>,
     Form(form): Form<GetForm>,
 ) -> Result<String, AppError> {
-    let leaderboard_type = &form.leaderboard_type;
+    let user_id = form.accountID;
+    let gjp2 = &form.gjp2;
 
-    let mut query: QueryBuilder<Postgres> = QueryBuilder::new(
-        r#"
-        SELECT  
-            id,
-            username,
-            stars,
-            demons,
-            creator_points,
-            color1,
-            color2,
-            coins,
-            icon_type,
-            display_icon,
-            user_coins,
-            message_setting,
-            friend_setting,
-            youtube,
-            icon,
-            ship,
-            ball,
-            ufo,
-            wave,
-            robot,
-            glow,
-            is_activated,
-            rank,
-            spider,
-            twitter,
-            twitch,
-            diamonds,
-            explosion,
-            mod_level,
-            comment_setting,
-            color3,
-            moons,
-            swing,
-            jetpack,
-            demon_info,
-            level_info,
-            platformer_info
-        FROM users
-        "#,
-    );
-
-    match leaderboard_type.as_str() {
-        "top" => {
-            query.push(" ORDER BY stars DESC");
+    let users: Vec<User> = match form.leaderboard_type.as_str() {
+        "top" | "relative" => {
+            sqlx::query_as("SELECT * FROM user_view ORDER BY stars DESC")
+                .fetch_all(&pool)
+                .await?
         }
         "creators" => {
-            query.push(" ORDER BY creator_points DESC");
+            sqlx::query_as("SELECT * FROM user_view ORDER BY creator_points DESC")
+                .fetch_all(&pool)
+                .await?
+        }
+        "friends" => {
+            if !verify_gjp2(&pool, user_id, gjp2).await? {
+                return Ok("-1".to_string());
+            }
+
+            sqlx::query_as(
+                r#"
+                SELECT user_view.*
+                FROM friendships f
+                JOIN user_view ON 
+                    (f.user1 = $1 AND user_view.id = f.user2) OR
+                    (f.user2 = $1 AND user_view.id = f.user1)
+                UNION
+                SELECT * FROM user_view WHERE id = $1
+                "#,
+            )
+            .bind(user_id)
+            .fetch_all(&pool)
+            .await?
         }
         _ => return Ok("".to_string()),
-    }
-
-    let users: Vec<User> = query.build_query_as().fetch_all(&pool).await?;
+    };
 
     let mut response = String::new();
 

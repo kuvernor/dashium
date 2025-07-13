@@ -98,106 +98,20 @@ impl GDResponse for User {
 
 impl User {
     pub async fn get_user(pool: &PgPool, user_id: i32) -> Result<Self> {
-        let user = sqlx::query_as!(
-            Self,
-            r#"
-            SELECT  
-            id,
-            username,
-            stars,
-            demons,
-            creator_points,
-            color1,
-            color2,
-            coins,
-            icon_type,
-            display_icon,
-            user_coins,
-            message_setting,
-            friend_setting,
-            youtube,
-            icon,
-            ship,
-            ball,
-            ufo,
-            wave,
-            robot,
-            glow,
-            is_activated,
-            rank,
-            spider,
-            twitter,
-            twitch,
-            diamonds,
-            explosion,
-            mod_level,
-            comment_setting,
-            color3,
-            moons,
-            swing,
-            jetpack,
-            demon_info,
-            level_info,
-            platformer_info
-            FROM users WHERE id = $1
-            "#,
-            user_id
-        )
-        .fetch_one(pool)
-        .await?;
+        let user = sqlx::query_as("SELECT * FROM user_view WHERE id = $1")
+            .bind(user_id)
+            .fetch_one(pool)
+            .await?;
 
         Ok(user)
     }
 
     pub async fn get_users(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
-        let users: Vec<User> = sqlx::query_as!(
-            User,
-            r#"
-            SELECT  
-            id,
-            username,
-            stars,
-            demons,
-            creator_points,
-            color1,
-            color2,
-            coins,
-            icon_type,
-            display_icon,
-            user_coins,
-            message_setting,
-            friend_setting,
-            youtube,
-            icon,
-            ship,
-            ball,
-            ufo,
-            wave,
-            robot,
-            glow,
-            is_activated,
-            rank,
-            spider,
-            twitter,
-            twitch,
-            diamonds,
-            explosion,
-            mod_level,
-            comment_setting,
-            color3,
-            moons,
-            swing,
-            jetpack,
-            demon_info,
-            level_info,
-            platformer_info
-            FROM users
-            WHERE username ILIKE '%' || $1 || '%'
-            "#,
-            search
-        )
-        .fetch_all(pool)
-        .await?;
+        let users: Vec<User> =
+            sqlx::query_as("SELECT * FROM user_view WHERE username ILIKE '%' || $1 || '%'")
+                .bind(search)
+                .fetch_all(pool)
+                .await?;
 
         Ok(users)
     }

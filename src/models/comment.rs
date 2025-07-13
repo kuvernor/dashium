@@ -29,6 +29,7 @@ pub struct Comment {
 impl GDResponse for Comment {
     fn to_gd(&self) -> String {
         let comment_string = vec![
+            format!("1~{}", self.level_id),
             format!("2~{}", base64_encode(&self.comment)),
             format!("3~{}", self.user_id),
             format!("4~{}", self.likes),
