@@ -18,3 +18,6 @@ pub use crate::gd::user::info::info;
 
 pub mod search;
 pub use crate::gd::user::search::search;
+
+pub mod settings;
+pub use crate::gd::user::settings::update_settings;

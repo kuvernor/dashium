@@ -34,6 +34,7 @@ pub fn routes() -> Router<PgPool> {
         .route("/updateGJUserScore22.php", post(user::update_stats))
         .route("/getGJUserInfo20.php", post(user::info))
         .route("/getGJUsers20.php", post(user::search))
+        .route("/updateGJAccSettings20.php", post(user::update_settings))
         // Misc
         .route("/getAccountURL.php", post(misc::url))
         .route("/likeGJItem211.php", post(misc::like))

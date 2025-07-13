@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 use crate::AppError;
-use crate::models::Block;
 use crate::models::message::Message;
+use crate::models::{Block, Friendship};
 use crate::util::verify_gjp2;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,6 +37,21 @@ pub async fn send_message(
 
     if Block::is_blocked(&pool, user_id, target_id).await? {
         return Ok("-1".to_string());
+    }
+
+    let message_setting =
+        sqlx::query_scalar!("SELECT message_setting FROM users WHERE id = $1", target_id)
+            .fetch_one(&pool)
+            .await?;
+
+    match message_setting {
+        1 => {
+            if !Friendship::exists(&pool, user_id, target_id).await? {
+                return Ok("-1".to_string());
+            }
+        }
+        2 => return Ok("-1".to_string()),
+        _ => (),
     }
 
     match Message::send(&pool, user_id, target_id, subject, body).await {

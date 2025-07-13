@@ -34,6 +34,15 @@ pub async fn send_friend_request(
         return Ok("-1".to_string());
     }
 
+    let friend_setting =
+        sqlx::query_scalar!("SELECT friend_setting FROM users WHERE id = $1", target_id)
+            .fetch_one(&pool)
+            .await?;
+
+    if friend_setting == 1 {
+        return Ok("-1".to_string());
+    }
+
     if Block::is_blocked(&pool, user_id, target_id).await? {
         return Ok("-1".to_string());
     }
