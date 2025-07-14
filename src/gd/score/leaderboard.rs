@@ -26,7 +26,7 @@ pub async fn get_leaderboard(
                 .await?
         }
         "creators" => {
-            sqlx::query_as("SELECT * FROM user_view ORDER BY creator_points DESC")
+            sqlx::query_as("SELECT * FROM user_view ORDER BY creator_points DESC, stars DESC")
                 .fetch_all(&pool)
                 .await?
         }

@@ -16,6 +16,7 @@ pub struct Level {
     pub user_id: i32,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub rated_at: Option<DateTime<Utc>>,
 
     pub extra_string: String,
     pub level_info: String,

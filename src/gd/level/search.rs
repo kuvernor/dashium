@@ -3,7 +3,11 @@ use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::{PgPool, Postgres, QueryBuilder};
 
-use crate::{AppError, GDResponse, models::Level, util::salt_and_sha1};
+use crate::{
+    AppError, GDResponse,
+    models::Level,
+    util::{is_numeric, salt_and_sha1},
+};
 
 #[derive(Serialize, DeserializeFirstDuplicate, Debug)]
 pub struct SearchForm {
@@ -46,7 +50,7 @@ pub struct SearchForm {
     str: String,
     total: i32,
     twoPlayer: i16,
-
+    uncompleted: i16,
     #[serde(rename = "type")]
     search_type: i16,
 }
@@ -71,16 +75,71 @@ pub async fn search_levels(
     let local = form.local;
     let star = form.star;
     let no_star = form.noStar;
+    let followed = &form.followed;
+    let completed_levels = &form.completedLevels;
+    let only_completed = form.onlyCompleted;
+    let uncompleted = form.uncompleted;
+    let original = form.original;
 
     let levels = match search_type {
-        27 => {
+        7 => {
+            let levels = sqlx::query_as!(
+                Level,
+                "SELECT * FROM levels WHERE objects > 9999 ORDER BY created_at DESC"
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            levels
+        }
+        11 => {
+            let levels = sqlx::query_as!(
+                Level,
+                "SELECT * FROM levels WHERE rated = 1 ORDER BY rated_at DESC, created_at DESC"
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            levels
+        }
+        12 => {
+            let user_ids: Vec<i32> = followed
+                .split(',')
+                .filter_map(|s| s.trim().parse::<i32>().ok())
+                .collect();
+
             let levels = sqlx::query_as!(
                 Level,
                 r#"
-                SELECT DISTINCT levels.*
+                SELECT * FROM levels
+                WHERE user_id = ANY($1)
+                ORDER BY created_at DESC
+                "#,
+                &user_ids
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            levels
+        }
+        13 => {
+            let levels = sqlx::query_as!(
+                Level,
+                r#"
+                SELECT levels.*
                 FROM levels
-                JOIN suggestions ON suggestions.level_id = levels.id
-                "#
+                WHERE levels.user_id IN (
+                    SELECT 
+                        CASE 
+                            WHEN friendships.user1 = $1 THEN friendships.user2
+                            ELSE friendships.user1
+                        END AS friend_id
+                    FROM friendships
+                    WHERE friendships.user1 = $1 OR friendships.user2 = $1
+                    ORDER BY created_at DESC
+                );
+                "#,
+                user_id
             )
             .fetch_all(&pool)
             .await?;
@@ -117,6 +176,20 @@ pub async fn search_levels(
 
             levels
         }
+        27 => {
+            let levels = sqlx::query_as!(
+                Level,
+                r#"
+                SELECT DISTINCT levels.*
+                FROM levels
+                JOIN suggestions ON suggestions.level_id = levels.id
+                "#
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            levels
+        }
         _ => {
             let mut query: QueryBuilder<Postgres> = QueryBuilder::new("SELECT * FROM levels");
 
@@ -137,6 +210,9 @@ pub async fn search_levels(
 
             query.push(" AND mythic = ");
             query.push_bind(mythic);
+
+            query.push(" AND original = ");
+            query.push_bind(original);
 
             match difficulty.as_str() {
                 "-" | "" => (),
@@ -182,9 +258,15 @@ pub async fn search_levels(
                 }
             }
 
-            if local == 1 {
-                query.push(" AND user_id = ");
-                query.push_bind(user_id);
+            if search_type == 5 {
+                if local == 1 {
+                    query.push(" AND user_id = ");
+                    query.push_bind(user_id);
+                } else {
+                    let user_id = search.parse::<i32>().unwrap_or(0);
+                    query.push(" AND user_id = ");
+                    query.push_bind(user_id);
+                }
             }
 
             if no_star == 1 && star == 0 {
@@ -193,8 +275,36 @@ pub async fn search_levels(
                 query.push(" AND rated = 1");
             }
 
+            let level_ids = completed_levels.trim_matches(|c| c == '(' || c == ')');
+            let level_ids: Vec<i32> = level_ids
+                .split(',')
+                .filter_map(|s| s.trim().parse::<i32>().ok())
+                .collect();
+
+            if only_completed == 1 {
+                query.push(" AND id = ANY(");
+                query.push_bind(level_ids);
+                query.push(")");
+            } else if uncompleted == 1 {
+                query.push(" AND id <> ALL(");
+                query.push_bind(level_ids);
+                query.push(")");
+            }
+
             match search_type {
-                0 | 1 => query.push(" ORDER BY downloads DESC"),
+                0 => {
+                    if !is_numeric(search) {
+                        query.push(" AND level_name ILIKE '%' || ");
+                        query.push_bind(search);
+                        query.push(" || '%'");
+                        query.push(" ORDER BY downloads DESC")
+                    } else {
+                        let level_id = search.parse::<i32>().unwrap_or(0);
+                        query.push(" AND id = ");
+                        query.push_bind(level_id)
+                    }
+                }
+                1 => query.push(" ORDER BY downloads DESC"),
                 2 => query.push(" ORDER BY likes DESC"),
                 3 => {
                     query.push(" AND created_at >= NOW() - INTERVAL '14 days'");

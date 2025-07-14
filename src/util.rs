@@ -11,6 +11,10 @@ pub fn is_ascii_alphanumeric(s: &str) -> bool {
     s.chars().all(|c| c.is_ascii_alphanumeric())
 }
 
+pub fn is_numeric(s: &str) -> bool {
+    s.chars().all(|c| c.is_ascii_digit())
+}
+
 pub fn salt_and_sha1(s: &str, salt: &str) -> String {
     let salted = s.to_owned() + salt;
 
