@@ -34,20 +34,19 @@ pub async fn suggest_level(
         2 => "Epic",
         3 => "Legendary",
         4 => "Mythic",
-        _ => return Ok("-2".to_string()),
+        _ => return Ok("-1".to_string()),
     };
 
     let mod_level = sqlx::query_scalar!("SELECT mod_level FROM users WHERE id = $1", user_id)
         .fetch_one(&pool)
         .await?;
 
-    println!("{mod_level}");
-    if mod_level != 1 || mod_level != 2 {
-        return Ok("-2".to_string());
+    if mod_level != 1 && mod_level != 2 {
+        return Ok("-1".to_string());
     }
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
-        return Ok("-2".to_string());
+        return Ok("-1".to_string());
     }
 
     sqlx::query!(

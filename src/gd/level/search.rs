@@ -1,31 +1,24 @@
 use axum::{Form, extract::State};
 use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
-use sqlx::PgPool;
+use sqlx::{PgPool, Postgres, QueryBuilder};
 
-use crate::{
-    AppError, GDResponse,
-    models::{Level, level::SearchParams},
-    util::salt_and_sha1,
-};
+use crate::{AppError, GDResponse, models::Level, util::salt_and_sha1};
 
 #[derive(Serialize, DeserializeFirstDuplicate, Debug)]
 pub struct SearchForm {
     accountID: i32,
     binaryVersion: i16,
-    #[serde(default)]
     coins: i16,
     #[serde(default)]
     completedLevels: String,
     #[serde(default)]
-    customSong: i32,
+    customSong: i16,
     #[serde(default)]
     demonFilter: i16,
-    #[serde(default)]
     diff: String,
     #[serde(default)]
     epic: i16,
-    #[serde(default)]
     featured: i16,
     #[serde(default)]
     followed: String,
@@ -35,7 +28,6 @@ pub struct SearchForm {
     gjp2: String,
     #[serde(default)]
     legendary: i16,
-    #[serde(default)]
     len: String,
     #[serde(default)]
     local: i16,
@@ -43,44 +35,183 @@ pub struct SearchForm {
     mythic: i16,
     #[serde(default)]
     noStar: i16,
-    #[serde(default)]
     onlyCompleted: i16,
-    #[serde(default)]
     original: i16,
-    #[serde(default)]
     page: i32,
     secret: String,
     #[serde(default)]
     song: i32,
     #[serde(default)]
     star: i16,
-    #[serde(default)]
     str: String,
-    #[serde(default)]
     total: i32,
-    #[serde(default)]
     twoPlayer: i16,
-    udid: String,
-    #[serde(default)]
-    uncompleted: u8,
-    uuid: String,
+
     #[serde(rename = "type")]
-    #[serde(default)]
-    list_type: i16,
+    search_type: i16,
 }
 
 pub async fn search_levels(
     State(pool): State<PgPool>,
     Form(form): Form<SearchForm>,
 ) -> Result<String, AppError> {
+    let user_id = form.accountID;
     let page = form.page;
+    let search = &form.str;
+    let search_type = form.search_type;
+    let coins = form.coins;
+    let epic = form.epic;
+    let legendary = form.legendary;
+    let featured = form.featured;
+    let two_player = form.twoPlayer;
+    let mythic = form.mythic;
+    let length = &form.len;
+    let difficulty = form.diff;
+    let demon_difficulty = form.demonFilter;
+    let local = form.local;
+    let star = form.star;
+    let no_star = form.noStar;
 
-    let params = SearchParams { search: form.str };
+    let levels = match search_type {
+        27 => {
+            let levels = sqlx::query_as!(
+                Level,
+                r#"
+                SELECT DISTINCT levels.*
+                FROM levels
+                JOIN suggestions ON suggestions.level_id = levels.id
+                "#
+            )
+            .fetch_all(&pool)
+            .await?;
 
-    let levels: Vec<Level> = Level::search(&pool, params).await?;
+            levels
+        }
+        25 => {
+            let list_levels = sqlx::query!(
+                r#"
+                SELECT levels FROM lists WHERE id = $1
+                "#,
+                search.parse::<i32>().unwrap_or(0)
+            )
+            .fetch_one(&pool)
+            .await?;
+
+            let level_ids: Vec<i32> = list_levels
+                .levels
+                .split(',')
+                .filter_map(|s| s.trim().parse::<i32>().ok())
+                .collect();
+
+            let levels = sqlx::query_as!(
+                Level,
+                r#"
+                SELECT *
+                FROM levels
+                WHERE id = ANY($1)
+                "#,
+                &level_ids
+            )
+            .fetch_all(&pool)
+            .await?;
+
+            levels
+        }
+        _ => {
+            let mut query: QueryBuilder<Postgres> = QueryBuilder::new("SELECT * FROM levels");
+
+            query.push(" WHERE COINS = ");
+            query.push_bind(coins);
+
+            query.push(" AND epic = ");
+            query.push_bind(epic);
+
+            query.push(" AND legendary = ");
+            query.push_bind(legendary);
+
+            query.push(" AND featured = ");
+            query.push_bind(featured);
+
+            query.push(" AND two_player = ");
+            query.push_bind(two_player);
+
+            query.push(" AND mythic = ");
+            query.push_bind(mythic);
+
+            match difficulty.as_str() {
+                "-" | "" => (),
+                "-2" => {
+                    query.push(" AND demon_difficulty in (");
+                    let mut separated = query.separated(", ");
+                    separated.push_bind(demon_difficulty);
+                    separated.push_unseparated(") ");
+                }
+                _ => {
+                    let difficulties: Vec<i16> = difficulty
+                        .split(',')
+                        .filter_map(|s| s.trim().parse::<i16>().ok())
+                        .collect();
+
+                    if !difficulties.is_empty() {
+                        query.push(" AND difficulty IN (");
+                        let mut separated = query.separated(", ");
+                        for difficulty in difficulties {
+                            separated.push_bind(difficulty);
+                        }
+                        separated.push_unseparated(")");
+                    }
+                }
+            }
+
+            match length.as_str() {
+                "-" | "" => (),
+                _ => {
+                    let lengths: Vec<i16> = length
+                        .split(',')
+                        .filter_map(|s| s.trim().parse::<i16>().ok())
+                        .collect();
+
+                    if !lengths.is_empty() {
+                        query.push(" AND length IN (");
+                        let mut separated = query.separated(", ");
+                        for length in lengths {
+                            separated.push_bind(length);
+                        }
+                        separated.push_unseparated(")");
+                    }
+                }
+            }
+
+            if local == 1 {
+                query.push(" AND user_id = ");
+                query.push_bind(user_id);
+            }
+
+            if no_star == 1 && star == 0 {
+                query.push(" AND rated = 0");
+            } else if star == 1 {
+                query.push(" AND rated = 1");
+            }
+
+            match search_type {
+                0 | 1 => query.push(" ORDER BY downloads DESC"),
+                2 => query.push(" ORDER BY likes DESC"),
+                3 => {
+                    query.push(" AND created_at >= NOW() - INTERVAL '14 days'");
+                    query.push(" ORDER BY downloads DESC")
+                }
+                4 => query.push(" ORDER BY created_at DESC"),
+                _ => &mut query,
+            };
+
+            let levels = query.build_query_as().fetch_all(&pool).await?;
+
+            levels
+        }
+    };
 
     if levels.is_empty() {
-        return Ok("-1".to_string());
+        return Ok("-2".to_string());
     }
 
     let offset = page * 10;

@@ -11,7 +11,6 @@ use crate::{AppError, util::verify_gjp2};
 pub struct UploadForm {
     accountID: i32,
     audioTrack: i16,
-    auto: i16,
     binaryVersion: i16,
     coins: i16,
     gameVersion: i16,
@@ -50,7 +49,6 @@ pub async fn upload_level(
     let user_id = form.accountID;
     let gjp2 = &form.gjp2;
     let official_song = form.audioTrack;
-    let auto = form.auto;
     let binary_version = form.binaryVersion;
     let coins = form.coins;
     let game_version = form.gameVersion;
@@ -82,7 +80,6 @@ pub async fn upload_level(
         INSERT INTO levels (
             user_id,
             official_song,
-            auto,
             binary_version,
             coins,
             game_version,
@@ -126,14 +123,12 @@ pub async fn upload_level(
             $19,
             $20,
             $21,
-            $22,
-            $23
+            $22
         )
         RETURNING id
         "#,
         user_id,
         official_song,
-        auto,
         binary_version,
         coins,
         game_version,

@@ -6,6 +6,6 @@ CREATE TABLE friend_requests (
     is_new SMALLINT NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (sender_id) REFERENCES users (id),
-    FOREIGN KEY (recipient_id) REFERENCES users (id)
+    FOREIGN KEY (sender_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_id) REFERENCES users (id) ON DELETE CASCADE
 );

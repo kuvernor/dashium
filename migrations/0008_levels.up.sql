@@ -42,8 +42,8 @@ CREATE TABLE levels (
     legendary SMALLINT NOT NULL DEFAULT 0,
     epic SMALLINT NOT NULL DEFAULT 0,
 
-    difficulty SMALLINT NOT NULL DEFAULT 0,
-    demon_difficulty SMALLINT NOT NULL DEFAULT 0,
+    difficulty SMALLINT NOT NULL DEFAULT -1,
+    demon_difficulty SMALLINT NOT NULL DEFAULT 3,
     stars SMALLINT NOT NULL DEFAULT 0,
     feature_score INT NOT NULL DEFAULT 0,
     
