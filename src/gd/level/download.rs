@@ -12,19 +12,9 @@ use tokio::io::AsyncReadExt;
 #[derive(DeserializeFirstDuplicate, Serialize, Debug)]
 pub struct DownloadForm {
     accountID: i32,
-    binaryVersion: i16,
-    gameVersion: i16,
     gjp2: String,
     levelID: i32,
     secret: String,
-    udid: String,
-    uuid: String,
-    #[serde(default)]
-    chk: String,
-    #[serde(default)]
-    inc: String,
-    #[serde(default)]
-    rs: String,
 }
 
 pub async fn download_level(
@@ -45,6 +35,32 @@ pub async fn download_level(
                 .fetch_one(&pool).await?;
 
             daily_id = row.id;
+            actual_level_id = row.level_id;
+
+            sqlx::query_as!(Level, "SELECT * FROM levels WHERE id = $1", row.level_id)
+                .fetch_one(&pool)
+                .await?
+        }
+        -2 => {
+            daily = true;
+            let row = sqlx::query!(
+                "SELECT id + 100000 AS daily_id, level_id FROM weekly_demons WHERE created_at < $1 ORDER BY created_at DESC", now)
+                .fetch_one(&pool).await?;
+
+            daily_id = row.daily_id.unwrap_or(0);
+            actual_level_id = row.level_id;
+
+            sqlx::query_as!(Level, "SELECT * FROM levels WHERE id = $1", row.level_id)
+                .fetch_one(&pool)
+                .await?
+        }
+        -3 => {
+            daily = true;
+            let row = sqlx::query!(
+                "SELECT id + 200000 AS daily_id, level_id FROM event_levels WHERE created_at < $1 ORDER BY created_at DESC", now)
+                .fetch_one(&pool).await?;
+
+            daily_id = row.daily_id.unwrap_or(0);
             actual_level_id = row.level_id;
 
             sqlx::query_as!(Level, "SELECT * FROM levels WHERE id = $1", row.level_id)
@@ -72,8 +88,8 @@ pub async fn download_level(
     let response = if daily {
         let user_string = format!("{}:{}:{}", level.user_id, level.username, level.user_id);
         vec![
-            format!("41:{}:", daily_id),
-            format!("4:{}:", level_data),
+            format!("41:{daily_id}:"),
+            format!("4:{level_data}:"),
             level.to_gd(),
             format!("#{hash1}"),
             format!("#{hash2}"),

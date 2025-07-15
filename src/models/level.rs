@@ -91,7 +91,6 @@ impl GDResponse for Level {
             format!("38:{}", self.verified_coins),
             format!("39:{}", self.requested_stars),
             format!("40:{}", self.ldm),
-            format!("41:{}", self.daily_number),
             format!("42:{}", self.epic),
             format!("43:{}", self.demon_difficulty),
             format!("44:{}", self.gauntlet),

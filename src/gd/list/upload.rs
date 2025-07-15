@@ -16,11 +16,7 @@ pub struct UploadForm {
     original: i32,
     unlisted: i16,
     gjp2: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn upload_list(

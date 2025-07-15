@@ -9,12 +9,8 @@ use crate::util::verify_gjp2;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DeleteForm {
     accountID: i32,
-    binaryVersion: i16,
-    gameVersion: i16,
     gjp2: String,
     secret: String,
-    udid: String,
-    uuid: String,
     #[serde(default)]
     messages: String,
     #[serde(default)]

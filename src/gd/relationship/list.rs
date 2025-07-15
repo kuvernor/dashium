@@ -15,11 +15,7 @@ pub struct ListForm {
     #[serde(default)]
     #[serde(rename = "type")]
     list_type: u8,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn get_user_list(

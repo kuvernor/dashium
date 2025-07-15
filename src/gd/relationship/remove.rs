@@ -9,11 +9,7 @@ pub struct RemoveForm {
     accountID: i32,
     gjp2: String,
     targetAccountID: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn remove_friend(

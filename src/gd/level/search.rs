@@ -138,6 +138,46 @@ pub async fn search_levels(
             .fetch_all(&pool)
             .await?
         }
+        21 => {
+            sqlx::query_as!(
+                Level,
+                r#"
+                SELECT levels.*
+                FROM levels
+                JOIN daily_levels ON levels.id = daily_levels.level_id
+                ORDER BY daily_levels.id DESC
+                "#
+            )
+            .fetch_all(&pool)
+            .await?
+        }
+        22 => {
+            sqlx::query_as!(
+                Level,
+                r#"
+                SELECT levels.*
+                FROM levels
+                JOIN weekly_demons ON levels.id = weekly_demons.level_id
+                ORDER BY weekly_demons.id DESC
+                "#
+            )
+            .fetch_all(&pool)
+            .await?
+        }
+        23 => {
+            sqlx::query_as!(
+                Level,
+                r#"
+                SELECT levels.*
+                FROM levels
+                JOIN event_levels ON levels.id = event_levels.level_id
+                ORDER BY event_levels.id DESC
+                "#
+            )
+            .fetch_all(&pool)
+            .await?
+        }
+
         25 => {
             let list_levels = sqlx::query!(
                 r#"

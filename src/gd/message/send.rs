@@ -14,11 +14,7 @@ pub struct SendForm {
     toAccountID: i32,
     subject: String,
     body: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    uuid: String,
-    udid: String,
 }
 
 pub async fn send_message(

@@ -12,11 +12,7 @@ pub struct DeleteForm {
     accounts: String,
     targetAccountID: i32,
     isSender: i16,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn delete_friend_request(

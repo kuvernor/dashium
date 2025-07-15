@@ -14,11 +14,7 @@ pub struct AcceptForm {
     targetAccountID: i32,
     gjp2: String,
     requestID: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn accept_friend_request(

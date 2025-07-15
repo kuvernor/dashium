@@ -9,14 +9,9 @@ pub struct GetForm {
     accountID: i32,
     gjp2: String,
     page: i32,
-    total: i32,
     #[serde(default)]
     getSent: i16,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn get_friend_requests(

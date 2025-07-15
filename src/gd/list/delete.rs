@@ -9,11 +9,7 @@ pub struct DeleteForm {
     accountID: i32,
     listID: i32,
     gjp2: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn delete_list(

@@ -11,12 +11,7 @@ pub struct GetForm {
     accountID: i32,
     gjp2: String,
     page: i32,
-    total: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    uuid: String,
-    udid: String,
 
     #[serde(default)]
     getSent: i16,

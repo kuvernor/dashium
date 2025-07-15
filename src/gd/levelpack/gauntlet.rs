@@ -6,12 +6,7 @@ use crate::{AppError, GDResponse, models::Gauntlet, util::salt_and_sha1};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
-    special: u8,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn get_gauntlets(

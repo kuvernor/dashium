@@ -7,11 +7,7 @@ use crate::{AppError, GDResponse, models::MapPack, util::salt_and_sha1};
 #[derive(Deserialize, Serialize, Debug)]
 pub struct GetForm {
     page: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn get_map_packs(

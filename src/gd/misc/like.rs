@@ -14,8 +14,6 @@ pub struct LikeForm {
     chk: String,
     itemID: i32,
     gjp2: String,
-    udid: String,
-    uuid: String,
     like: u8,
 }
 

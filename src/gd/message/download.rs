@@ -10,11 +10,7 @@ pub struct DownloadForm {
     accountID: i32,
     gjp2: String,
     messageID: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    uuid: String,
-    udid: String,
 }
 
 pub async fn download_message(

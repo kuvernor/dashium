@@ -4,7 +4,7 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
 use base64::{Engine as _, engine::general_purpose::URL_SAFE};
-use chrono::{Duration, Local};
+use chrono::{Datelike, Duration, Local, Weekday};
 use sha1::{Digest, Sha1};
 use sqlx::PgPool;
 
@@ -71,6 +71,29 @@ pub fn time_until_midnight() -> String {
     let now = Local::now();
     (now + Duration::days(1))
         .date_naive()
+        .and_hms_opt(0, 0, 0)
+        .unwrap()
+        .and_local_timezone(Local)
+        .unwrap()
+        .signed_duration_since(now)
+        .num_seconds()
+        .to_string()
+}
+
+pub fn time_until_monday() -> String {
+    let now = Local::now();
+
+    let days = match now.weekday() {
+        Weekday::Mon => 7,
+        Weekday::Tue => 6,
+        Weekday::Wed => 5,
+        Weekday::Thu => 4,
+        Weekday::Fri => 3,
+        Weekday::Sat => 2,
+        Weekday::Sun => 1,
+    };
+
+    (now.date_naive() + Duration::days(days as i64))
         .and_hms_opt(0, 0, 0)
         .unwrap()
         .and_local_timezone(Local)
