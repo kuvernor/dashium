@@ -51,8 +51,6 @@ pub async fn send_friend_request(
         return Ok("-1".to_string());
     }
 
-    match FriendRequest::send(&pool, user_id, target_id, body).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    FriendRequest::send(&pool, user_id, target_id, body).await?;
+    Ok("1".to_string())
 }

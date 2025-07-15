@@ -28,8 +28,6 @@ pub async fn delete_list(
         return Ok("-1".to_string());
     }
 
-    match List::delete(&pool, user_id, list_id).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    List::delete(&pool, user_id, list_id).await?;
+    Ok("1".to_string())
 }

@@ -40,8 +40,6 @@ pub async fn upload_comment(
         return Ok("-1".to_string());
     }
 
-    match Comment::upload(&pool, user_id, username, level_id, comment, percent).await {
-        Ok(response) => Ok(response.to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    let comment_id = Comment::upload(&pool, user_id, username, level_id, comment, percent).await?;
+    Ok(comment_id.to_string())
 }

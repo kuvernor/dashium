@@ -40,13 +40,9 @@ pub fn hash_gjp2(gjp2: &str) -> Result<String> {
 
 pub async fn verify_gjp2(pool: &PgPool, user_id: i32, gjp2: &str) -> Result<bool> {
     let argon2 = Argon2::default();
-    let hash = match sqlx::query_scalar!("SELECT hash FROM users WHERE id = $1", user_id)
+    let hash = sqlx::query_scalar!("SELECT hash FROM users WHERE id = $1", user_id)
         .fetch_one(pool)
-        .await
-    {
-        Ok(hash) => hash,
-        Err(_) => return Ok(false),
-    };
+        .await?;
 
     let hash = PasswordHash::new(&hash).expect("Failed to parse hash");
 

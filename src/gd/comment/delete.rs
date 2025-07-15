@@ -30,8 +30,6 @@ pub async fn delete_comment(
         return Ok("-1".to_string());
     }
 
-    match Comment::delete(&pool, user_id, level_id, comment_id).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    Comment::delete(&pool, user_id, level_id, comment_id).await?;
+    Ok("1".to_string())
 }

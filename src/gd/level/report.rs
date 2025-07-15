@@ -16,11 +16,9 @@ pub async fn report_level(
 ) -> Result<String, AppError> {
     let level_id = form.levelID;
 
-    match sqlx::query!("INSERT INTO level_reports (level_id) VALUES ($1)", level_id)
+    sqlx::query!("INSERT INTO level_reports (level_id) VALUES ($1)", level_id)
         .execute(&pool)
-        .await
-    {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+        .await?;
+
+    Ok("1".to_string())
 }

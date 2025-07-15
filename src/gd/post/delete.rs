@@ -30,8 +30,6 @@ pub async fn delete_post(
         return Ok("-1".to_string());
     }
 
-    match Post::delete(&pool, post_id, user_id).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    Post::delete(&pool, post_id, user_id).await?;
+    Ok("1".to_string())
 }

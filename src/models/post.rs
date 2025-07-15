@@ -46,7 +46,7 @@ impl Post {
         Ok(posts)
     }
 
-    pub async fn upload(pool: &PgPool, body: &str, user_id: i32, username: &str) -> Result<String> {
+    pub async fn upload(pool: &PgPool, body: &str, user_id: i32, username: &str) -> Result<i32> {
         let post_id = sqlx::query_scalar!(
             "INSERT INTO posts (body, user_id, username) VALUES ($1, $2, $3) RETURNING id",
             body,
@@ -56,7 +56,7 @@ impl Post {
         .fetch_one(pool)
         .await?;
 
-        Ok(post_id.to_string())
+        Ok(post_id)
     }
 
     pub async fn delete(pool: &PgPool, post_id: i32, user_id: i32) -> Result<()> {

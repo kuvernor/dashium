@@ -54,8 +54,6 @@ pub async fn send_message(
         _ => (),
     }
 
-    match Message::send(&pool, user_id, target_id, subject, body).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    Message::send(&pool, user_id, target_id, subject, body).await?;
+    Ok("1".to_string())
 }

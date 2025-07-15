@@ -28,8 +28,7 @@ pub async fn delete_level(
         return Ok("-1".to_string());
     }
 
-    match Level::delete(&pool, user_id, level_id).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    Level::delete(&pool, user_id, level_id).await?;
+
+    Ok("1".to_string())
 }

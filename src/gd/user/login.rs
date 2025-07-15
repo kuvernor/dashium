@@ -1,7 +1,6 @@
 use axum::{Form, extract::State};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::{debug, info};
 
 use crate::AppError;
 use crate::models::User;
@@ -29,10 +28,8 @@ pub async fn login(
     let user_id = User::id_from_username(&pool, username).await?;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
-        debug!("{username} failed to login: incorrect username or password");
         return Ok(String::from("-11"));
     }
 
-    info!("{username} logged in succesfully!");
     Ok(format!("{user_id},{user_id}"))
 }

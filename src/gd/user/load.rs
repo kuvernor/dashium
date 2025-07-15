@@ -26,8 +26,6 @@ pub async fn load_data(
         return Ok("-1".to_string());
     }
 
-    match User::load_data(&pool, user_id).await {
-        Ok(save_data) => Ok(format!("{save_data};21;30;a;a")),
-        Err(_) => Ok("-1".to_string()),
-    }
+    let save_data = User::load_data(&pool, user_id).await?;
+    Ok(format!("{save_data};21;30;a;a"))
 }

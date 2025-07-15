@@ -42,6 +42,7 @@ pub async fn like(
         4 => query.push(" lists SET"),
         _ => return Ok("1".to_string()),
     };
+
     match like {
         0 => {
             query.push(" likes = likes - 1 WHERE id = ");

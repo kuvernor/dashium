@@ -37,5 +37,5 @@ pub async fn upload_post(
 
     let response = Post::upload(&pool, body, user_id, username).await?;
 
-    Ok(response)
+    Ok(response.to_string())
 }

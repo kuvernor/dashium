@@ -28,8 +28,6 @@ pub async fn save_data(
         return Ok("-1".to_string());
     }
 
-    match User::save_data(&pool, user_id, data).await {
-        Ok(_) => Ok("1".to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    User::save_data(&pool, user_id, data).await?;
+    Ok("1".to_string())
 }

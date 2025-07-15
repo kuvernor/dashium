@@ -162,5 +162,5 @@ pub async fn update_stats(
     .execute(&pool)
     .await?;
 
-    Ok(format!("{user_id}"))
+    Ok(user_id.to_string())
 }

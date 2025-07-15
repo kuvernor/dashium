@@ -42,7 +42,7 @@ pub async fn upload_list(
 
     let username = &User::username_from_id(&pool, user_id).await?;
 
-    match sqlx::query_scalar!(
+    let list_id = sqlx::query_scalar!(
         r#"
         INSERT INTO lists (
             user_id,
@@ -67,9 +67,7 @@ pub async fn upload_list(
         levels
     )
     .fetch_one(&pool)
-    .await
-    {
-        Ok(list_id) => Ok(list_id.to_string()),
-        Err(_) => Ok("-1".to_string()),
-    }
+    .await?;
+
+    Ok(list_id.to_string())
 }
