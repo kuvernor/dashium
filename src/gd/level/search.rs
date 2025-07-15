@@ -83,24 +83,20 @@ pub async fn search_levels(
 
     let levels = match search_type {
         7 => {
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 "SELECT * FROM levels WHERE objects > 9999 ORDER BY created_at DESC"
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         11 => {
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 "SELECT * FROM levels WHERE rated = 1 ORDER BY rated_at DESC, created_at DESC"
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         12 => {
             let user_ids: Vec<i32> = followed
@@ -108,7 +104,7 @@ pub async fn search_levels(
                 .filter_map(|s| s.trim().parse::<i32>().ok())
                 .collect();
 
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 r#"
                 SELECT * FROM levels
@@ -118,12 +114,10 @@ pub async fn search_levels(
                 &user_ids
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         13 => {
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 r#"
                 SELECT levels.*
@@ -142,9 +136,7 @@ pub async fn search_levels(
                 user_id
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         25 => {
             let list_levels = sqlx::query!(
@@ -162,7 +154,7 @@ pub async fn search_levels(
                 .filter_map(|s| s.trim().parse::<i32>().ok())
                 .collect();
 
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 r#"
                 SELECT *
@@ -172,12 +164,10 @@ pub async fn search_levels(
                 &level_ids
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         27 => {
-            let levels = sqlx::query_as!(
+            sqlx::query_as!(
                 Level,
                 r#"
                 SELECT DISTINCT levels.*
@@ -186,33 +176,39 @@ pub async fn search_levels(
                 "#
             )
             .fetch_all(&pool)
-            .await?;
-
-            levels
+            .await?
         }
         _ => {
-            let mut query: QueryBuilder<Postgres> = QueryBuilder::new("SELECT * FROM levels");
+            let mut query: QueryBuilder<Postgres> =
+                QueryBuilder::new("SELECT * FROM levels WHERE 1 = 1");
 
-            query.push(" WHERE COINS = ");
-            query.push_bind(coins);
+            if coins == 1 {
+                query.push(" AND coins = 1");
+            }
 
-            query.push(" AND epic = ");
-            query.push_bind(epic);
+            if epic == 1 {
+                query.push(" AND epic = 1");
+            }
 
-            query.push(" AND legendary = ");
-            query.push_bind(legendary);
+            if legendary == 1 {
+                query.push(" AND legendary = 1");
+            }
 
-            query.push(" AND featured = ");
-            query.push_bind(featured);
+            if featured == 1 {
+                query.push(" AND featured = 1");
+            }
 
-            query.push(" AND two_player = ");
-            query.push_bind(two_player);
+            if two_player == 1 {
+                query.push(" AND two_player = 1");
+            }
 
-            query.push(" AND mythic = ");
-            query.push_bind(mythic);
+            if mythic == 1 {
+                query.push(" AND mythic = 1");
+            }
 
-            query.push(" AND original = ");
-            query.push_bind(original);
+            if original == 1 {
+                query.push(" AND original = 1");
+            }
 
             match difficulty.as_str() {
                 "-" | "" => (),
@@ -314,9 +310,7 @@ pub async fn search_levels(
                 _ => &mut query,
             };
 
-            let levels = query.build_query_as().fetch_all(&pool).await?;
-
-            levels
+            query.build_query_as().fetch_all(&pool).await?
         }
     };
 

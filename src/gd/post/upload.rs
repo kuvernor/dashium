@@ -28,7 +28,7 @@ pub async fn upload_post(
 ) -> Result<String, AppError> {
     let user_id = form.accountID;
     let gjp2 = &form.gjp2;
-    let body = &base64_decode(&form.comment)?;
+    let body = &String::from_utf8(base64_decode(&form.comment)?)?;
     let username = &form.userName;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {

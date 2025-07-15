@@ -12,6 +12,7 @@ pub mod misc;
 pub mod moderator;
 pub mod post;
 pub mod relationship;
+pub mod reward;
 pub mod score;
 pub mod user;
 
@@ -95,4 +96,6 @@ pub fn routes() -> Router<PgPool> {
         .route("/deleteGJLevelList.php", post(list::delete_list))
         // Scores
         .route("/getGJScores20.php", post(score::get_leaderboard))
+        // Rewards
+        .route("/getGJChallenges.php", post(reward::get_quests))
 }

@@ -56,6 +56,16 @@ pub fn base64_encode(input: &str) -> String {
     URL_SAFE.encode(input)
 }
 
-pub fn base64_decode(input: &str) -> Result<String> {
-    Ok(String::from_utf8(URL_SAFE.decode(input)?)?)
+pub fn base64_decode(input: &str) -> Result<Vec<u8>> {
+    Ok(URL_SAFE.decode(input)?)
+}
+
+pub fn cyclic_xor(data: &[u8], key: &[u8]) -> Result<String> {
+    let xor: Vec<u8> = data
+        .iter()
+        .zip(key.iter().cycle())
+        .map(|(b, k)| b ^ k)
+        .collect();
+
+    Ok(String::from_utf8(xor)?)
 }

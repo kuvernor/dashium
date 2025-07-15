@@ -33,7 +33,7 @@ pub async fn upload_comment(
     let gjp2 = &form.gjp2;
     let level_id = form.levelID;
     let username = &form.userName;
-    let comment = &base64_decode(&form.comment)?;
+    let comment = &String::from_utf8(base64_decode(&form.comment)?)?;
     let percent = form.percent;
 
     if !verify_gjp2(&pool, user_id, gjp2).await? {
