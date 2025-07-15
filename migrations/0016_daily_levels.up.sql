@@ -1,0 +1,7 @@
+CREATE TABLE daily_levels (
+    id SERIAL PRIMARY KEY,
+    level_id INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    FOREIGN KEY (level_id) REFERENCES levels (id) ON DELETE CASCADE
+); 

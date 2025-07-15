@@ -12,3 +12,6 @@ pub use crate::gd::level::delete::delete_level;
 
 pub mod report;
 pub use crate::gd::level::report::report_level;
+
+pub mod daily;
+pub use crate::gd::level::daily::get_daily;

@@ -79,6 +79,7 @@ pub fn routes() -> Router<PgPool> {
         .route("/downloadGJLevel22.php", post(level::download_level))
         .route("/deleteGJLevelUser20.php", post(level::delete_level))
         .route("/reportGJLevel.php", post(level::report_level))
+        .route("/getGJDailyLevel.php", post(level::get_daily))
         // Moderator
         .route("/requestUserAccess.php", post(moderator::request_moderator))
         .route("/suggestGJStars20.php", post(moderator::suggest_level))

@@ -4,6 +4,7 @@ use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
 use base64::{Engine as _, engine::general_purpose::URL_SAFE};
+use chrono::{Duration, Local};
 use sha1::{Digest, Sha1};
 use sqlx::PgPool;
 
@@ -68,4 +69,17 @@ pub fn cyclic_xor(data: &[u8], key: &[u8]) -> Result<String> {
         .collect();
 
     Ok(String::from_utf8(xor)?)
+}
+
+pub fn time_until_midnight() -> String {
+    let now = Local::now();
+    (now + Duration::days(1))
+        .date_naive()
+        .and_hms_opt(0, 0, 0)
+        .unwrap()
+        .and_local_timezone(Local)
+        .unwrap()
+        .signed_duration_since(now)
+        .num_seconds()
+        .to_string()
 }

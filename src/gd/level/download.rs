@@ -1,6 +1,7 @@
 use crate::GDResponse;
 use crate::{AppError, models::Level, util::salt_and_sha1};
 use axum::{Form, extract::State};
+use chrono::Utc;
 use serde::Serialize;
 use serde_deserialize_duplicates::DeserializeFirstDuplicate;
 use sqlx::PgPool;
@@ -31,26 +32,63 @@ pub async fn download_level(
     Form(form): Form<DownloadForm>,
 ) -> Result<String, AppError> {
     let level_id = form.levelID;
+    let mut daily = false;
+    let mut daily_id = 0;
+    let mut actual_level_id = 0;
+    let now = Utc::now();
 
-    let level = &Level::get(&pool, level_id).await?;
+    let level = match level_id {
+        -1 => {
+            daily = true;
+            let row = sqlx::query!(
+                "SELECT id, level_id FROM daily_levels WHERE created_at < $1 ORDER BY created_at DESC", now)
+                .fetch_one(&pool).await?;
 
-    let path = format!("./data/levels/{level_id}.level");
+            daily_id = row.id;
+            actual_level_id = row.level_id;
+
+            sqlx::query_as!(Level, "SELECT * FROM levels WHERE id = $1", row.level_id)
+                .fetch_one(&pool)
+                .await?
+        }
+        _ => Level::get(&pool, level_id).await?,
+    };
+
+    let path = if daily {
+        format!("./data/levels/{actual_level_id}.level")
+    } else {
+        format!("./data/levels/{level_id}.level")
+    };
+
     let path = Path::new(&path);
     let mut file = File::open(path).await?;
     let mut level_data = vec![];
     file.read_to_end(&mut level_data).await?;
     let level_data = String::from_utf8(level_data)?;
 
-    let level_string = format!("4:{}:{}", level_data, level.to_gd());
-
-    Level::update_downloads(&pool, level_id).await?;
-
     let hash1 = generate_hash1(&level_data);
-    let hash2 = generate_hash2(level);
+    let hash2 = generate_hash2(&level, daily_id);
 
-    let response = [level_string, hash1, hash2];
+    let response = if daily {
+        let user_string = format!("{}:{}:{}", level.user_id, level.username, level.user_id);
+        vec![
+            format!("41:{}:", daily_id),
+            format!("4:{}:", level_data),
+            level.to_gd(),
+            format!("#{hash1}"),
+            format!("#{hash2}"),
+            format!("#{user_string}"),
+        ]
+    } else {
+        vec![
+            format!("4:{}:", level_data),
+            level.to_gd(),
+            format!("#{hash1}"),
+            format!("#{hash2}"),
+        ]
+    };
 
-    Ok(response.join("#"))
+    Ok(response.join(""))
 }
 
 pub fn generate_hash1(level_string: &str) -> String {
@@ -76,18 +114,18 @@ pub fn generate_hash1(level_string: &str) -> String {
     salt_and_sha1(&hash, "")
 }
 
-pub fn generate_hash2(level: &Level) -> String {
+pub fn generate_hash2(level: &Level, daily_id: i32) -> String {
     let user_id = level.user_id;
     let stars = level.stars;
     let demon = level.demon;
+
     let level_id = level.id;
     let verified_coins = level.verified_coins;
     let feature_score = level.feature_score;
     let password = &level.password;
-    let daily_number = level.daily_number;
 
     let hash = format!(
-        "{user_id},{stars},{demon},{level_id},{verified_coins},{feature_score},{password},{daily_number}"
+        "{user_id},{stars},{demon},{level_id},{verified_coins},{feature_score},{password},{daily_id}"
     );
 
     salt_and_sha1(&hash, "xI25fpAapCQg")
