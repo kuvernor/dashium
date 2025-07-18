@@ -54,6 +54,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
 
 [[package]]
+name = "api"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "gd",
+ "serde",
+ "sqlx",
+ "tokio",
+]
+
+[[package]]
 name = "argon2"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -330,16 +342,10 @@ name = "dashium"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "argon2",
+ "api",
  "axum",
- "base64",
- "chrono",
- "chrono-humanize",
  "dotenvy",
- "serde",
- "serde-deserialize-duplicates",
- "serde_json",
- "sha1",
+ "gd",
  "sqlx",
  "tokio",
  "tower-http",
@@ -557,6 +563,24 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
+]
+
+[[package]]
+name = "gd"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "argon2",
+ "axum",
+ "base64",
+ "chrono",
+ "chrono-humanize",
+ "serde",
+ "serde_html_form",
+ "serde_json",
+ "sha1",
+ "sqlx",
+ "tokio",
 ]
 
 [[package]]
@@ -1468,18 +1492,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde-deserialize-duplicates"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beb1a1aaae8c5cb726dcc0714433c653fe059c9a9f9fd2d7c4475adcbbe25db8"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde",
- "syn",
-]
-
-[[package]]
 name = "serde_derive"
 version = "1.0.219"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1488,6 +1500,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "serde_html_form"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d2de91cf02bbc07cde38891769ccd5d4f073d22a40683aa4bc7a95781aaa2c4"
+dependencies = [
+ "form_urlencoded",
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
 ]
 
 [[package]]

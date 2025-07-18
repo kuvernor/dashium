@@ -5,8 +5,8 @@ CREATE TABLE messages (
     subject TEXT NOT NULL,
     body TEXT NOT NULL,
     username VARCHAR(50) NOT NULL,
-    is_read SMALLINT NOT NULL DEFAULT 0,
-    is_sender SMALLINT NOT NULL DEFAULT 1,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    is_sender BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (sender_id) REFERENCES users (id),

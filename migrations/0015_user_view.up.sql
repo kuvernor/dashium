@@ -21,7 +21,7 @@ SELECT
     wave,
     robot,
     glow,
-    is_activated,
+    activated,
     rank,
     spider,
     twitter,

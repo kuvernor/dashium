@@ -1,0 +1,16 @@
+CREATE TABLE level_scores (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    level_id INT NOT NULL,
+    percent SMALLINT NOT NULL,
+    attempts INT NOT NULL DEFAULT 0,
+    coins SMALLINT NOT NULL DEFAULT 0,
+    clicks INT NOT NULL DEFAULT 0,
+    time INT NOT NULL DEFAULT 0,
+    progresses TEXT NOT NULL,
+    daily_id INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (level_id) REFERENCES levels (id) ON DELETE CASCADE
+);

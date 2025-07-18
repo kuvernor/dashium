@@ -8,14 +8,6 @@ use tower_http::trace::TraceLayer;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
-pub mod error;
-pub use crate::error::AppError;
-mod api;
-pub mod gd;
-pub use crate::gd::GDResponse;
-mod models;
-mod util;
-
 #[tokio::main]
 async fn main() -> Result<()> {
     setup_logging();

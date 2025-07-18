@@ -8,7 +8,7 @@ CREATE TABLE lists (
     downloads INT NOT NULL DEFAULT 0,
     difficulty SMALLINT NOT NULL,
     likes INT NOT NULL DEFAULT 0,
-    is_rated SMALLINT NOT NULL DEFAULT 0,
+    rated BOOLEAN NOT NULL DEFAULT FALSE,
     levels VARCHAR(2048) NOT NULL,
     reward INT NOT NULL DEFAULT 0,
     requirement INT NOT NULL DEFAULT 1,
