@@ -6,11 +6,15 @@ description = "A Geometry Dash Private Server written in Rust"
 
 [workspace]
 resolver = "3"
-members = ["gd", "api"]
+members = ["dashium-core", "dashium-api"]
+
+[[bin]]
+name = "dashium"
+path = "dashium/main.rs"
 
 [dependencies]
-api = { path = "api" }
-gd = { path = "gd" }
+dashium-api = { path = "dashium-api" }
+dashium-core = { path = "dashium-core" }
 axum = "0.8.4"
 anyhow = "1.0"
 dotenvy = "0.15.7"

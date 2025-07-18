@@ -54,18 +54,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
 
 [[package]]
-name = "api"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "axum",
- "gd",
- "serde",
- "sqlx",
- "tokio",
-]
-
-[[package]]
 name = "argon2"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -342,15 +330,45 @@ name = "dashium"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "api",
  "axum",
+ "dashium-api",
+ "dashium-core",
  "dotenvy",
- "gd",
  "sqlx",
  "tokio",
  "tower-http",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "dashium-api"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "dashium-core",
+ "serde",
+ "sqlx",
+ "tokio",
+]
+
+[[package]]
+name = "dashium-core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "argon2",
+ "axum",
+ "base64",
+ "chrono",
+ "chrono-humanize",
+ "serde",
+ "serde_html_form",
+ "serde_json",
+ "sha1",
+ "sqlx",
+ "tokio",
 ]
 
 [[package]]
@@ -563,24 +581,6 @@ dependencies = [
  "pin-project-lite",
  "pin-utils",
  "slab",
-]
-
-[[package]]
-name = "gd"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "argon2",
- "axum",
- "base64",
- "chrono",
- "chrono-humanize",
- "serde",
- "serde_html_form",
- "serde_json",
- "sha1",
- "sqlx",
- "tokio",
 ]
 
 [[package]]

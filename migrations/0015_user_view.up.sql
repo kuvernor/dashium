@@ -14,7 +14,7 @@ SELECT
     message_setting,
     friend_setting,
     youtube,
-    icon,
+    cube,
     ship,
     ball,
     ufo,
@@ -36,5 +36,6 @@ SELECT
     jetpack,
     demon_info,
     level_info,
-    platformer_info
+    platformer_info,
+    created_at
 FROM users;
