@@ -9,11 +9,7 @@ pub struct deleteGJLevelUser20 {
     accountID: i32,
     gjp2: String,
     levelID: i32,
-    binaryVersion: i16,
-    gameVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn deleteGJLevelUser20(

@@ -8,11 +8,7 @@ use crate::{AppError, util::verify_gjp2};
 pub struct requestUserAccess {
     accountID: i32,
     gjp2: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn requestUserAccess(

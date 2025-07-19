@@ -14,12 +14,7 @@ pub struct getGJCommentHistory {
     gjp2: String,
     page: i32,
     mode: u8,
-    total: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn getGJCommentHistory(

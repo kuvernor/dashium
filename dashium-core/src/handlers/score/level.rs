@@ -108,10 +108,10 @@ pub async fn getGJLevelScores211(
             sqlx::query_as(
                 r#"
                 SELECT user_view.*
-                FROM user_view
-                JOIN level_scores ON user_view.id = level_scores.user_id
-                WHERE level_scores.level_id = $1
-                ORDER BY level_scores.percent DESC
+                FROM user_view u
+                JOIN level_scores l ON u.id = l.user_id
+                WHERE l.level_id = $1
+                ORDER BY l.percent DESC
                 "#,
             )
             .bind(level_id)
@@ -123,11 +123,11 @@ pub async fn getGJLevelScores211(
             sqlx::query_as(
                 r#"
                 SELECT user_view.*
-                FROM user_view
-                JOIN level_scores ON user_view.id = level_scores.user_id
-                WHERE level_scores.level_id = $1
-                AND level_scores.created_at >= NOW() - INTERVAL '14 days'
-                ORDER BY level_scores.percent DESC
+                FROM user_view u
+                JOIN level_scores l ON u.id = l.user_id
+                WHERE l.level_id = $1
+                AND l.created_at >= NOW() - INTERVAL '14 days'
+                ORDER BY l.percent DESC
                 "#,
             )
             .bind(level_id)
@@ -145,11 +145,11 @@ pub async fn getGJLevelScores211(
             sqlx::query_as(
                 r#"
                 SELECT user_view.*
-                FROM user_view
-                JOIN level_scores ON user_view.id = level_scores.user_id
-                WHERE level_scores.level_id = $1
-                AND level_scores.user_id = ANY($2)
-                ORDER BY level_scores.percent DESC
+                FROM user_view u
+                JOIN level_scores l ON u.id = l.user_id
+                WHERE l.level_id = $1
+                AND l.user_id = ANY($2)
+                ORDER BY l.percent DESC
                 "#,
             )
             .bind(level_id)

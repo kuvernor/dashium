@@ -12,12 +12,7 @@ use crate::{
 pub struct uploadGJComment21 {
     accountID: i32,
     gjp2: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
-    chk: String,
     comment: String,
     levelID: i32,
     #[serde(default)]

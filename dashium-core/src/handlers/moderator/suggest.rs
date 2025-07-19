@@ -11,11 +11,7 @@ pub struct suggestGJStars20 {
     feature: i16,
     levelID: i32,
     stars: i16,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn suggestGJStars20(

@@ -133,19 +133,19 @@ pub async fn getGJLevels21(
                 sqlx::query_as!(
                     Level,
                     r#"
-                SELECT levels.*
-                FROM levels
-                WHERE levels.user_id IN (
-                    SELECT 
+                    SELECT levels.*
+                    FROM levels
+                    WHERE levels.user_id IN (
+                        SELECT 
                         CASE 
                             WHEN friendships.user1 = $1 THEN friendships.user2
                             ELSE friendships.user1
                         END AS friend_id
-                    FROM friendships
-                    WHERE friendships.user1 = $1 OR friendships.user2 = $1
-                    ORDER BY created_at DESC
-                );
-                "#,
+                        FROM friendships
+                        WHERE friendships.user1 = $1 OR friendships.user2 = $1
+                        ORDER BY created_at DESC
+                    );
+                    "#,
                     user_id
                 )
                 .fetch_all(&pool)
@@ -155,11 +155,11 @@ pub async fn getGJLevels21(
                 sqlx::query_as!(
                     Level,
                     r#"
-                SELECT levels.*
-                FROM levels
-                JOIN daily_levels ON levels.id = daily_levels.level_id
-                ORDER BY daily_levels.id DESC
-                "#
+                    SELECT levels.*
+                    FROM levels
+                    JOIN daily_levels ON levels.id = daily_levels.level_id
+                    ORDER BY daily_levels.id DESC
+                    "#
                 )
                 .fetch_all(&pool)
                 .await?
@@ -168,11 +168,11 @@ pub async fn getGJLevels21(
                 sqlx::query_as!(
                     Level,
                     r#"
-                SELECT levels.*
-                FROM levels
-                JOIN weekly_demons ON levels.id = weekly_demons.level_id
-                ORDER BY weekly_demons.id DESC
-                "#
+                    SELECT levels.*
+                    FROM levels
+                    JOIN weekly_demons ON levels.id = weekly_demons.level_id
+                    ORDER BY weekly_demons.id DESC
+                    "#
                 )
                 .fetch_all(&pool)
                 .await?
@@ -181,11 +181,11 @@ pub async fn getGJLevels21(
                 sqlx::query_as!(
                     Level,
                     r#"
-                SELECT levels.*
-                FROM levels
-                JOIN event_levels ON levels.id = event_levels.level_id
-                ORDER BY event_levels.id DESC
-                "#
+                    SELECT levels.*
+                    FROM levels
+                    JOIN event_levels ON levels.id = event_levels.level_id
+                    ORDER BY event_levels.id DESC
+                    "#
                 )
                 .fetch_all(&pool)
                 .await?
@@ -240,11 +240,11 @@ pub async fn getGJLevels21(
                 }
 
                 if epic {
-                    query.push(" AND epic = TRUE");
+                    query.push(" AND epic_rating = 1");
                 }
 
                 if legendary {
-                    query.push(" AND legendary = TRUE");
+                    query.push(" AND epic_rating = 2");
                 }
 
                 if featured {
@@ -256,7 +256,7 @@ pub async fn getGJLevels21(
                 }
 
                 if mythic {
-                    query.push(" AND mythic = TRUE");
+                    query.push(" AND epic_rating = 3");
                 }
 
                 if original {

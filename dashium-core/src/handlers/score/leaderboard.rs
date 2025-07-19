@@ -39,9 +39,9 @@ pub async fn getGJScores20(
                 r#"
                 SELECT user_view.*
                 FROM friendships f
-                JOIN user_view ON 
-                    (f.user1 = $1 AND user_view.id = f.user2) OR
-                    (f.user2 = $1 AND user_view.id = f.user1)
+                JOIN user_view u ON 
+                    (f.user1 = $1 AND u.id = f.user2) OR
+                    (f.user2 = $1 AND u.id = f.user1)
                 UNION
                 SELECT * FROM user_view WHERE id = $1
                 "#,

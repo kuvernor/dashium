@@ -12,11 +12,7 @@ pub struct getGJLevelLists {
     #[serde(rename = "type")]
     search_type: u8,
     gjp2: String,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn getGJLevelLists(

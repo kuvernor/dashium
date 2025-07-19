@@ -8,9 +8,22 @@ use crate::{
     util::{hash_gjp2, salt_and_sha1},
 };
 
-#[derive(Debug, FromRow, Serialize)]
+#[derive(FromRow, Serialize)]
 pub struct User {
     pub id: i32,
+
+    #[serde(skip)]
+    #[sqlx(skip)]
+    pub hash: String,
+
+    #[serde(skip)]
+    #[sqlx(skip)]
+    pub email: String,
+
+    #[serde(skip)]
+    #[sqlx(skip)]
+    pub save_data: String,
+
     pub username: String,
     pub stars: i32,
     pub demons: i32,
@@ -19,11 +32,6 @@ pub struct User {
     pub moons: i32,
     pub coins: i32,
     pub user_coins: i32,
-    pub color1: i16,
-    pub color2: i16,
-    pub color3: i16,
-    pub icon_type: i16,
-    pub display_icon: i16,
     pub message_setting: i16,
     pub friend_setting: i16,
     pub comment_setting: i16,
@@ -41,8 +49,13 @@ pub struct User {
     pub explosion: i16,
     pub swing: i16,
     pub jetpack: i16,
+    pub color1: i16,
+    pub color2: i16,
+    pub color3: i16,
+    pub icon_type: i16,
+    pub display_icon: i16,
     pub activated: bool,
-    pub rank: i32,
+    pub rank: Option<i64>,
     pub mod_level: i16,
     pub demon_info: String,
     pub level_info: String,
@@ -79,7 +92,7 @@ impl GDResponse for User {
             format!("26:{}", self.robot),
             format!("28:{}", self.glow),
             format!("29:{activated}"),
-            format!("30:{}", self.rank),
+            format!("30:{}", self.rank.unwrap_or(0)),
             format!("43:{}", self.spider),
             format!("44:{}", self.twitter),
             format!("45:{}", self.twitch),
@@ -111,10 +124,12 @@ impl User {
     }
 
     pub async fn get_by_name(pool: &PgPool, search: &str) -> Result<Vec<Self>> {
-        let users = sqlx::query_as("SELECT * FROM user_view WHERE username ILIKE '%' || $1 || '%'")
-            .bind(search)
-            .fetch_all(pool)
-            .await?;
+        let users = sqlx::query_as(
+            "SELECT * FROM user_view WHERE username ILIKE '%' || $1 || '%' LIMIT 100",
+        )
+        .bind(search)
+        .fetch_all(pool)
+        .await?;
 
         Ok(users)
     }
@@ -163,7 +178,7 @@ impl User {
 
     pub async fn is_email_taken(pool: &PgPool, email: &str) -> Result<bool> {
         let exists: bool = sqlx::query_scalar!(
-            "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1) AS \"exists!\"",
+            "SELECT EXISTS(SELECT 1 FROM users WHERE email ILIKE $1) AS \"exists!\"",
             email
         )
         .fetch_one(pool)

@@ -37,10 +37,8 @@ pub struct Level {
     pub objects: i32,
     pub coins: i16,
     pub requested_stars: i16,
-    pub legendary: bool,
     pub gauntlet: bool,
     pub two_player: bool,
-    pub mythic: bool,
     pub rated: bool,
     pub featured: bool,
     pub difficulty: i16,
@@ -52,7 +50,7 @@ pub struct Level {
     pub wt: i32,
     pub wt2: i32,
     pub daily_number: i16,
-    pub epic: bool,
+    pub epic_rating: i16,
     pub verification_time: i32,
 }
 
@@ -63,7 +61,6 @@ impl GDResponse for Level {
         let verified_coins = if self.verified_coins { 1 } else { 0 };
         let ldm = if self.ldm { 1 } else { 0 };
         let rated = if self.rated { 1 } else { 0 };
-        let epic = if self.epic { 1 } else { 0 };
         let demon = if self.demon { 1 } else { 0 };
         let two_player = if self.two_player { 1 } else { 0 };
 
@@ -96,7 +93,7 @@ impl GDResponse for Level {
             format!("38:{verified_coins}"),
             format!("39:{}", self.requested_stars),
             format!("40:{ldm}"),
-            format!("42:{epic}"),
+            format!("42:{}", self.epic_rating),
             format!("43:{}", self.demon_difficulty),
             format!("44:{gauntlet}"),
             format!("45:{}", self.objects),

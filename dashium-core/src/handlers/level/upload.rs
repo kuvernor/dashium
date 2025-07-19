@@ -32,14 +32,11 @@ pub struct uploadGJLevel21 {
     password: String,
     requestedStars: i16,
     secret: String,
-    seed: String,
     songID: i32,
     #[serde(deserialize_with = "int_to_bool")]
     twoPlayer: bool,
-    udid: String,
     unlisted: i16,
     userName: String,
-    uuid: String,
     wt: i32,
     wt2: i32,
 

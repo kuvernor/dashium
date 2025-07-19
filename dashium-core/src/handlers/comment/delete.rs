@@ -10,11 +10,7 @@ pub struct deleteGJComment20 {
     gjp2: String,
     commentID: i32,
     levelID: i32,
-    gameVersion: i16,
-    binaryVersion: i16,
     secret: String,
-    udid: String,
-    uuid: String,
 }
 
 pub async fn deleteGJComment20(
